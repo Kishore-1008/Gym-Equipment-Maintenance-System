@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account · Gym Equipment Maintenance System</title>
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="auth-shell">
+
+    <!-- ===================== Identity / brand panel ===================== -->
+    <div class="auth-visual">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <span class="brand-name">Gym Equipment Maintenance System</span>
+      </div>
+
+      <div>
+        <h1>Get every technician<br />on the same system.</h1>
+        <p class="lede">
+          Create an account to log equipment status, schedule maintenance,
+          and keep repair history in one place.
+        </p>
+
+        <!-- Signature element: service tag -->
+        <div class="service-tag" aria-hidden="true">
+          <div class="tag-row">
+            <span>SYSTEM</span>
+            <strong>GEMS</strong>
+          </div>
+          <div class="tag-row">
+            <span>ROLES</span>
+            <strong>Admin · Technician · Staff</strong>
+          </div>
+          <div class="perforation"></div>
+          <div class="tag-row">
+            <span>STATUS</span>
+          </div>
+          <span class="status-pill">Operational</span>
+        </div>
+      </div>
+
+      <p class="footnote">Your account is stored on this device for this demo build.</p>
+    </div>
+
+    <!-- ===================== Form panel ===================== -->
+    <div class="auth-form-panel">
+      <div class="auth-card">
+        <div class="eyebrow">New account</div>
+        <h2>Create your account</h2>
+        <p class="subtext">Fill in your details to get access to the system.</p>
+
+        <div id="registerAlert"></div>
+
+        <form id="registerForm" novalidate>
+          <div class="mb-3">
+            <label for="fullName" class="form-label">Full name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="fullName"
+              name="fullName"
+              placeholder="e.g. Priya Kumar"
+              autocomplete="name"
+              required
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              placeholder="e.g. priyak"
+              autocomplete="username"
+              required
+            />
+            <div class="helper-text">3–20 characters: letters, numbers, or underscores.</div>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="At least 8 characters"
+              autocomplete="new-password"
+              required
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role" required>
+              <option value="" selected disabled>Select a role</option>
+              <option value="Admin">Admin</option>
+              <option value="Technician">Technician</option>
+              <option value="Staff">Staff</option>
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <button type="submit" class="btn-tag">Create Account</button>
+        </form>
+
+        <p class="auth-switch">
+          Already have an account? <a href="login.html">Log In</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

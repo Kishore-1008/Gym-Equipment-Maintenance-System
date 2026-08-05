@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In · Gym Equipment Maintenance System</title>
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="auth-shell">
+
+    <!-- ===================== Identity / brand panel ===================== -->
+    <div class="auth-visual">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <span class="brand-name">Gym Equipment Maintenance System</span>
+      </div>
+
+      <div>
+        <h1>Every machine.<br />Tracked, tagged, maintained.</h1>
+        <p class="lede">
+          Sign in to manage equipment, maintenance schedules, and repair
+          history across your gym.
+        </p>
+
+        <!-- Signature element: brand illustration (gear + dumbbell + wrench) -->
+        <div class="brand-illustration" aria-hidden="true">
+          <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <!-- Gear ring: teeth -->
+            <g fill="var(--safety-orange)" opacity="0.9">
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(0 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(30 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(60 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(90 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(120 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(150 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(180 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(210 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(240 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(270 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(300 120 120)" />
+              <rect x="113" y="4" width="14" height="22" rx="3" transform="rotate(330 120 120)" />
+            </g>
+
+            <!-- Gear ring outline + inner disk -->
+            <circle cx="120" cy="120" r="92" fill="none" stroke="var(--safety-orange)" stroke-width="2.5" opacity="0.4" />
+            <circle cx="120" cy="120" r="78" fill="var(--graphite-700)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5" />
+
+            <!-- Dumbbell, centered -->
+            <g transform="rotate(-18 120 120)">
+              <rect x="52" y="94" width="10" height="52" rx="4" fill="var(--safety-orange)" />
+              <rect x="64" y="102" width="8" height="36" rx="3" fill="var(--safety-orange)" opacity="0.75" />
+              <rect x="70" y="116" width="100" height="8" rx="4" fill="var(--text-inverse)" />
+              <rect x="168" y="102" width="8" height="36" rx="3" fill="var(--safety-orange)" opacity="0.75" />
+              <rect x="178" y="94" width="10" height="52" rx="4" fill="var(--safety-orange)" />
+            </g>
+
+            <!-- Wrench badge, lower right -->
+            <circle cx="176" cy="176" r="28" fill="var(--graphite-900)" stroke="var(--safety-orange)" stroke-width="2" />
+            <g transform="translate(159,159) scale(1.4)">
+              <path
+                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                fill="none"
+                stroke="var(--steel-blue)"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                transform="scale(1.15) translate(-1,-1)"
+              />
+            </g>
+          </svg>
+          <span class="illustration-caption">Precision equipment care</span>
+        </div>
+      </div>
+
+      <p class="footnote">Authorized personnel only. Contact your administrator for access.</p>
+    </div>
+
+    <!-- ===================== Form panel ===================== -->
+    <div class="auth-form-panel">
+      <div class="auth-card">
+        <div class="eyebrow">Authentication</div>
+        <h2>Log in to your account</h2>
+        <p class="subtext">Enter your credentials to continue.</p>
+
+        <div id="loginAlert"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="mb-3">
+            <label for="loginIdentifier" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="loginIdentifier"
+              name="loginIdentifier"
+              placeholder="e.g. admin"
+              autocomplete="username"
+              required
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="loginPassword"
+              name="loginPassword"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <button type="submit" class="btn-tag">Log In</button>
+        </form>
+
+        <p class="auth-switch">
+          Don't have an account? <a href="register.html">Create Account</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
