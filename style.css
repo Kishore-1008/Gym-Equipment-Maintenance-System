@@ -7,10 +7,11 @@
    ============================================================ */
 
 /* ---------- Fonts ----------
-   Oswald   -> condensed, stenciled feel for headings/labels
-   Inter    -> body copy, form fields, buttons
-   IBM Plex Mono -> tag numbers, status codes, monospaced data */
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+   Inter is the single typeface across the app.
+   400 -> body copy · 500 -> secondary labels/navigation
+   600 -> buttons, table headings, important labels
+   700 -> main headings and major section titles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   /* Core palette */
@@ -51,7 +52,8 @@ body {
 }
 
 .eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -96,7 +98,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 700;
   color: var(--graphite-900);
   font-size: 1.05rem;
@@ -104,8 +106,8 @@ body {
 }
 
 .brand-name {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
   font-size: 0.95rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -113,7 +115,7 @@ body {
 }
 
 .auth-visual h1 {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 700;
   font-size: clamp(1.9rem, 3.4vw, 2.6rem);
   line-height: 1.12;
@@ -164,7 +166,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
   font-size: 0.72rem;
   color: var(--text-inverse-muted);
   margin-bottom: 0.35rem;
@@ -179,7 +182,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -219,7 +223,8 @@ body {
 }
 
 .brand-illustration .illustration-caption {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -249,8 +254,8 @@ body {
 }
 
 .auth-card h2 {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
   font-size: 1.6rem;
   margin-bottom: 0.3rem;
 }
@@ -405,8 +410,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .dash-greeting {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
   font-size: clamp(1.35rem, 3vw, 1.8rem);
   color: var(--text-dark);
   margin: 0;
@@ -488,7 +493,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .row-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
   font-size: 0.66rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -496,9 +502,407 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .row-value {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 600;
   font-size: 1rem;
   color: var(--text-dark);
   overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   Equipment Dashboard (Admin) — additive section.
+   Reuses existing tokens (--safety-orange, --steel-blue,
+   --ok-green, --alert-red, --graphite-*, --steel-*, radii,
+   shadow) so it stays visually consistent with the rest of
+   the app instead of introducing a second design language.
+   ============================================================ */
+
+.eq-user-chip {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  font-size: 0.76rem;
+  color: var(--text-inverse-muted);
+  white-space: nowrap;
+}
+
+.eq-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.25rem clamp(1rem, 4vw, 2.5rem) 3rem;
+}
+
+/* ---------- Header row ---------- */
+.eq-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.eq-header .dash-greeting {
+  text-align: left;
+  margin-bottom: 0.15rem;
+}
+
+.eq-subtitle {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.eq-quick-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btn-tag-outline {
+  background: transparent;
+  border: 1.5px solid var(--safety-orange);
+  color: var(--safety-orange-dark);
+  font-weight: 600;
+  font-size: 0.84rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-tag-outline:hover, .btn-tag-outline:focus-visible {
+  background: var(--safety-orange);
+  color: var(--graphite-900);
+}
+
+/* ---------- 1. Summary cards ---------- */
+.eq-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.eq-card {
+  background: var(--steel-100);
+  border: 1px solid var(--steel-200);
+  border-left: 4px solid var(--steel-blue);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  box-shadow: var(--shadow-card);
+}
+
+.eq-card-value {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  font-size: 1.9rem;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.eq-card-label {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.eq-card-ok    { border-left-color: var(--ok-green); }
+.eq-card-warn  { border-left-color: var(--safety-orange); }
+.eq-card-danger{ border-left-color: var(--alert-red); }
+.eq-card-info  { border-left-color: var(--steel-blue); }
+
+/* ---------- Panels (shared shell for health / attention / overview) ---------- */
+.eq-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.6fr);
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 860px) {
+  .eq-grid-2 { grid-template-columns: 1fr; }
+}
+
+.eq-panel {
+  background: var(--steel-100);
+  border: 1px solid var(--steel-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 1.4rem 1.5rem 1.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.eq-grid-2 .eq-panel { margin-bottom: 0; }
+
+.eq-panel-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 0 0 0.2rem;
+  color: var(--text-dark);
+}
+
+.eq-panel-subtitle {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  margin: 0 0 1.1rem;
+}
+
+.eq-panel-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.eq-panel-header-row .eq-panel-title,
+.eq-panel-header-row .eq-panel-subtitle { margin-bottom: 0; }
+
+/* ---------- 2. Equipment Health ---------- */
+.eq-health-row {
+  display: grid;
+  grid-template-columns: auto 9rem 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+}
+
+.eq-health-label {
+  font-size: 0.86rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.eq-health-bar-track {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--steel-50);
+  overflow: hidden;
+}
+
+.eq-health-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.eq-health-count {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  min-width: 1.4rem;
+  text-align: right;
+}
+
+.eq-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.eq-dot-ok     { background: var(--ok-green); }
+.eq-dot-warn   { background: var(--safety-orange); }
+.eq-dot-info   { background: var(--steel-blue); }
+.eq-dot-danger { background: var(--alert-red); }
+
+/* ---------- Tables (Maintenance Attention / Equipment Overview) ---------- */
+.eq-table-wrap { overflow-x: auto; }
+
+.eq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.eq-table th {
+  text-align: left;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1.5px solid var(--steel-200);
+  white-space: nowrap;
+}
+
+.eq-table td {
+  padding: 0.65rem 0.7rem;
+  border-bottom: 1px solid var(--steel-200);
+  color: var(--text-dark);
+  vertical-align: middle;
+}
+
+.eq-table tbody tr:hover { background: var(--steel-50); }
+
+.eq-mono {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.eq-empty-state {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  padding: 1rem 0.25rem 0.25rem;
+  margin: 0;
+}
+
+/* ---------- Status / priority badges ---------- */
+.eq-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.eq-badge-ok     { background: rgba(47, 179, 128, 0.12); color: #1c8560; }
+.eq-badge-warn   { background: rgba(255, 106, 61, 0.12); color: var(--safety-orange-dark); }
+.eq-badge-info   { background: rgba(62, 110, 142, 0.12); color: var(--steel-blue); }
+.eq-badge-danger { background: rgba(229, 72, 77, 0.1);  color: #c23c40; }
+
+.eq-priority {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.eq-priority-high   { background: rgba(229, 72, 77, 0.1);  color: #c23c40; }
+.eq-priority-medium { background: rgba(255, 106, 61, 0.12); color: var(--safety-orange-dark); }
+.eq-priority-low    { background: rgba(100, 112, 122, 0.12); color: var(--text-muted); }
+
+/* ---------- Toolbar (search / filter) ---------- */
+.eq-toolbar {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.eq-search-input, .eq-filter-select {
+  border: 1.5px solid var(--steel-200);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.84rem;
+  background: var(--steel-100);
+  color: var(--text-dark);
+}
+
+.eq-search-input {
+  min-width: 200px;
+  flex: 1 1 200px;
+}
+
+.eq-search-input:focus, .eq-filter-select:focus {
+  outline: none;
+  border-color: var(--safety-orange);
+  box-shadow: 0 0 0 3px rgba(255, 106, 61, 0.15);
+}
+
+/* ---------- Misc ---------- */
+.eq-data-note {
+  text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.eq-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translate(-50%, 12px);
+  background: var(--graphite-900);
+  color: var(--text-inverse);
+  font-size: 0.86rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 50;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.eq-toast-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-toast { transition: none; }
+}
+
+/* ============================================================
+   Password visibility toggle — additive, scoped to the new
+   .password-field wrapper only. Existing .form-control styling
+   (border, radius, focus ring, invalid state) is untouched.
+   ============================================================ */
+.password-field {
+  position: relative;
+}
+
+.password-field .form-control {
+  padding-right: 2.6rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.password-toggle-btn:hover {
+  color: var(--steel-blue);
+}
+
+.password-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.password-toggle-btn .icon-eye-off {
+  display: none;
+}
+
+.password-toggle-btn.is-visible .icon-eye {
+  display: none;
+}
+
+.password-toggle-btn.is-visible .icon-eye-off {
+  display: block;
 }

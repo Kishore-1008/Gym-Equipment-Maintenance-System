@@ -14,11 +14,37 @@
 const USERS_KEY   = "gym_ams_users";
 const SESSION_KEY = "gym_ams_session";
 
+/* ============================================================
+   Roles
+   ------------------------------------------------------------
+   ADMIN, GYM_MANAGER, and TECHNICIAN are the only supported
+   roles — this is what gets stored on the user record and in
+   the session. There is no "Staff" role; Gym Manager replaces
+   it everywhere. ROLE_LABELS is only for display — never store
+   or compare against the human-readable label.
+   ============================================================ */
+const ROLES = {
+  ADMIN: "ADMIN",
+  GYM_MANAGER: "GYM_MANAGER",
+  TECHNICIAN: "TECHNICIAN",
+};
+
+const ROLE_LABELS = {
+  [ROLES.ADMIN]: "Admin",
+  [ROLES.GYM_MANAGER]: "Gym Manager",
+  [ROLES.TECHNICIAN]: "Technician",
+};
+
+/** Human-readable label for a stored role code (falls back to the raw code). */
+function roleLabel(roleCode) {
+  return ROLE_LABELS[roleCode] || roleCode;
+}
+
 /* Where each role lands after a successful login */
 const ROLE_DASHBOARDS = {
-  Admin: "admin-dashboard.html",
-  Technician: "technician-dashboard.html",
-  Staff: "staff-dashboard.html",
+  [ROLES.ADMIN]: "admin-dashboard.html",
+  [ROLES.GYM_MANAGER]: "gym-manager-dashboard.html",
+  [ROLES.TECHNICIAN]: "technician-dashboard.html",
 };
 
 /* ============================================================
@@ -77,7 +103,7 @@ async function seedDefaultAdmin() {
     fullName: "System Administrator",
     username: "admin",
     password: passwordHash,
-    role: "Admin",
+    role: ROLES.ADMIN,
   });
   saveUsers(users);
 }
@@ -275,7 +301,7 @@ function requireSession(expectedRole) {
   if (detailUsername) detailUsername.textContent = session.username;
 
   const detailRole = document.getElementById("detailRole");
-  if (detailRole) detailRole.textContent = session.role;
+  if (detailRole) detailRole.textContent = roleLabel(session.role);
 
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
@@ -289,10 +315,37 @@ function requireSession(expectedRole) {
 }
 
 /* ============================================================
+   Password visibility toggle
+   ------------------------------------------------------------
+   Works off data-target on any .password-toggle-btn, so it
+   applies to the registration password field now and to any
+   other password field (e.g. Confirm Password, login) later
+   without further JS changes. Only flips the input's type
+   attribute — the value itself is never touched, so the field
+   still submits normally.
+   ============================================================ */
+function initPasswordToggles() {
+  document.querySelectorAll(".password-toggle-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = document.getElementById(btn.getAttribute("data-target"));
+      if (!input) return;
+
+      const willShow = input.type === "password";
+      input.type = willShow ? "text" : "password";
+
+      btn.classList.toggle("is-visible", willShow);
+      btn.setAttribute("aria-pressed", String(willShow));
+      btn.setAttribute("aria-label", willShow ? "Hide password" : "Show password");
+    });
+  });
+}
+
+/* ============================================================
    Init
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
   seedDefaultAdmin();
   initRegisterForm();
   initLoginForm();
+  initPasswordToggles();
 });
