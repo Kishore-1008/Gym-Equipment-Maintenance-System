@@ -125,7 +125,7 @@
   <script src="equipment-dashboard.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const session = requireSession("Admin");
+      const session = requireSession(ROLES.ADMIN);
       if (session) initEquipmentDashboard(session);
     });
   </script>

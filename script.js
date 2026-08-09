@@ -343,7 +343,7 @@ function initPasswordToggles() {
 /* ============================================================
    Init
    ============================================================ */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   seedDefaultAdmin();
   initRegisterForm();
   initLoginForm();
