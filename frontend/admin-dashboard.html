@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Equipment Dashboard · Gym Equipment Maintenance System</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="dash-nav">
+    <div class="brand d-flex align-items-center gap-2">
+      <div class="brand-mark">G</div>
+      <span class="brand-name">Gym Equipment Maintenance System</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <span class="eq-user-chip" id="eqUserChip">—</span>
+      <button class="btn-change-password" id="changePasswordBtn">Change Password</button>
+      <button class="btn-logout" id="logoutBtn">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="eq-page">
+
+    <!-- ---------- Page header ---------- -->
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+        <p class="eq-subtitle">Here's the current condition of your gym equipment.</p>
+      </div>
+
+      <div class="eq-quick-actions">
+        <button class="btn-tag-outline" data-eq-action="add">+ Add Equipment</button>
+        <button class="btn-tag-outline" data-eq-action="view">View Equipment</button>
+        <button class="btn-tag-outline" data-eq-action="schedule">Schedule Maintenance</button>
+      </div>
+    </div>
+
+    <!-- ---------- 1. Summary cards ---------- -->
+    <section class="eq-summary-grid" id="eqSummaryCards" aria-label="Equipment summary"></section>
+
+    <div class="eq-grid-2">
+      <!-- ---------- 2. Equipment health overview ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Equipment Health</h2>
+        <p class="eq-panel-subtitle">At a glance: what's healthy and what needs attention.</p>
+        <div id="eqHealthOverview" aria-label="Equipment health breakdown"></div>
+      </section>
+
+      <!-- ---------- 3. Maintenance attention ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Maintenance Attention</h2>
+        <p class="eq-panel-subtitle">Equipment that needs a technician's eyes.</p>
+        <div class="eq-table-wrap">
+          <table class="eq-table">
+            <thead>
+              <tr>
+                <th>Equipment ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Maintenance Interval</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="eqAttentionBody"></tbody>
+          </table>
+          <p class="eq-empty-state" id="eqAttentionEmpty" hidden>Nothing needs attention right now.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ---------- 4 & 6. Equipment overview with search / filter ---------- -->
+    <section class="eq-panel">
+      <div class="eq-panel-header-row">
+        <div>
+          <h2 class="eq-panel-title">Equipment Overview</h2>
+          <p class="eq-panel-subtitle">Search or filter to find any piece of equipment.</p>
+        </div>
+        <div class="eq-toolbar">
+          <input
+            type="search"
+            id="eqSearchInput"
+            class="eq-search-input"
+            placeholder="Search by name or ID…"
+            aria-label="Search equipment"
+          />
+          <select id="eqCategoryFilter" class="eq-filter-select" aria-label="Filter by category">
+            <option value="">All categories</option>
+          </select>
+          <select id="eqStatusFilter" class="eq-filter-select" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="OPERATIONAL">Operational</option>
+            <option value="MAINTENANCE_DUE">Maintenance Due</option>
+            <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+            <option value="OUT_OF_SERVICE">Out of Service</option>
+          </select>
+        </div>
+      </div>
+      <div class="eq-table-wrap">
+        <table class="eq-table">
+          <thead>
+            <tr>
+              <th>Equipment ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="eqOverviewBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="eqOverviewEmpty" hidden>No equipment matches that search.</p>
+      </div>
+    </section>
+
+    <p class="eq-data-note">Live data from the Equipment Management API.</p>
+  </main>
+
+  <!-- ============================================================
+       Usage Monitoring — Admin view: view / filter / delete.
+       Equipment Management above this point is unchanged.
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="eq-section-title">Usage Monitoring</p>
+        <p class="eq-subtitle">Number of usage sessions logged per equipment, per day.</p>
+      </div>
+    </div>
+
+    <!-- ---------- A. Summary cards ---------- -->
+    <section class="eq-summary-grid" id="usageSummaryCards" aria-label="Usage summary"></section>
+
+    <!-- ---------- B. Usage table ---------- -->
+    <section class="eq-panel">
+      <div class="eq-panel-header-row">
+        <div>
+          <h2 class="eq-panel-title">Usage Table</h2>
+          <p class="eq-panel-subtitle">Session counts for the selected date.</p>
+        </div>
+        <div class="eq-toolbar">
+          <select id="usageZoneFilter" class="eq-filter-select" aria-label="Filter by zone">
+            <option value="">All Zones</option>
+          </select>
+          <input type="date" id="usageDateFilter" class="eq-filter-select" aria-label="Date" />
+        </div>
+      </div>
+      <div class="eq-table-wrap">
+        <table class="eq-table">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Zone</th>
+              <th>Sessions</th>
+              <th>Usage Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usageTableBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="usageTableEmpty" hidden>No equipment matches that filter.</p>
+      </div>
+    </section>
+
+    <div class="eq-grid-2">
+      <!-- ---------- C. Usage history / trend ---------- -->
+      <section class="eq-panel">
+        <div class="eq-panel-header-row">
+          <div>
+            <h2 class="eq-panel-title">Usage History</h2>
+            <p class="eq-panel-subtitle">
+              <span id="usageHistoryTrendLabel"></span>
+            </p>
+          </div>
+          <div class="eq-toolbar eq-toolbar-tight">
+            <select id="usageHistoryEquipmentSelect" class="eq-filter-select" aria-label="Equipment"></select>
+            <select id="usageHistoryGroupBySelect" class="eq-filter-select" aria-label="Daily, weekly, or monthly">
+              <option value="day">Daily</option>
+              <option value="week">Weekly</option>
+              <option value="month">Monthly</option>
+            </select>
+          </div>
+        </div>
+        <div class="eq-trend-chart" id="usageHistoryChart" aria-label="Usage trend chart"></div>
+        <div class="eq-table-wrap">
+          <table class="eq-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sessions</th>
+              </tr>
+            </thead>
+            <tbody id="usageHistoryBody"></tbody>
+          </table>
+          <p class="eq-empty-state" id="usageHistoryEmpty" hidden>No usage history for this equipment yet.</p>
+        </div>
+      </section>
+
+      <!-- ---------- D. Top used equipment ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Top Used Equipment</h2>
+        <p class="eq-panel-subtitle">Ranked by total sessions over the last 30 days.</p>
+        <div id="usageTopList" aria-label="Top used equipment"></div>
+        <p class="eq-empty-state" id="usageTopEmpty" hidden>No usage logged yet.</p>
+      </section>
+    </div>
+  </main>
+
+  <div class="eq-toast" id="eqToast" role="status" aria-live="polite"></div>
+  <div class="eq-toast" id="usageToast" role="status" aria-live="polite"></div>
+
+  <!-- ---------- Delete confirmation modal ---------- -->
+  <div class="eq-modal-backdrop" id="usageModalBackdrop" hidden></div>
+
+  <div class="eq-modal eq-modal-confirm" id="usageDeleteModal" hidden role="dialog" aria-modal="true" aria-labelledby="usageDeleteTitle">
+    <div class="eq-modal-dialog eq-modal-dialog-sm">
+      <h3 id="usageDeleteTitle">Delete usage record?</h3>
+      <p id="usageDeleteMessage">Are you sure you want to delete this usage record?</p>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline" id="usageDeleteCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag-danger" id="usageDeleteConfirmBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Add / Edit Equipment modal ---------- -->
+  <div class="eq-modal-backdrop" id="eqModalBackdrop" hidden></div>
+
+  <div class="eq-modal" id="eqModal" hidden role="dialog" aria-modal="true" aria-labelledby="eqModalTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="eqModalTitle">Add Equipment</h3>
+        <button type="button" class="eq-modal-close" id="eqModalCloseBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="eqForm" novalidate>
+        <div id="eqFormAlert"></div>
+
+        <div class="mb-3">
+          <label class="form-label" for="eqFieldId">Equipment ID</label>
+          <input type="text" class="form-control" id="eqFieldId" readonly />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="eqFieldName">Equipment Name</label>
+          <select class="form-select" id="eqFieldName" required>
+            <option value="" selected disabled>Select equipment</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="eqFieldCategory">Category</label>
+          <input type="text" class="form-control" id="eqFieldCategory" readonly placeholder="Auto-determined" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="eqFieldInterval">Maintenance Interval</label>
+          <select class="form-select" id="eqFieldInterval" required>
+            <option value="" selected disabled>Select interval</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="eqFieldStatus">Status</label>
+          <select class="form-select" id="eqFieldStatus" required></select>
+        </div>
+
+        <div class="eq-modal-actions">
+          <button type="button" class="btn-tag-outline" id="eqModalCancelBtn">Cancel</button>
+          <button type="submit" class="btn-tag eq-modal-save" id="eqModalSaveBtn">Save Equipment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- Delete confirmation modal ---------- -->
+  <div class="eq-modal eq-modal-confirm" id="eqDeleteModal" hidden role="dialog" aria-modal="true" aria-labelledby="eqDeleteTitle">
+    <div class="eq-modal-dialog eq-modal-dialog-sm">
+      <h3 id="eqDeleteTitle">Delete equipment?</h3>
+      <p id="eqDeleteMessage">Are you sure you want to delete this equipment?</p>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline" id="eqDeleteCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag-danger" id="eqDeleteConfirmBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+<!-- ---------- Change Password modal (shared markup — see script.js#initChangePasswordModal) ---------- -->
+  <div class="eq-modal-backdrop" id="changePasswordBackdrop" hidden></div>
+
+  <div class="eq-modal" id="changePasswordModal" hidden role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="changePasswordTitle">Change Password</h3>
+        <button type="button" class="eq-modal-close" id="changePasswordCloseBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="changePasswordForm" novalidate>
+        <div id="changePasswordAlert"></div>
+
+        <div class="mb-3">
+          <label class="form-label" for="currentPassword">Current Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="currentPassword"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="currentPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="newPassword">New Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="newPassword"
+              autocomplete="new-password"
+              placeholder="At least 8 characters"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="newPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="confirmNewPassword">Confirm New Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="confirmNewPassword"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="confirmNewPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="eq-modal-actions">
+          <button type="button" class="btn-tag-outline" id="changePasswordCancelBtn">Cancel</button>
+          <button type="submit" class="btn-tag eq-modal-save" id="changePasswordSaveBtn">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <script src="script.js"></script>
+  <script src="equipment-data.js"></script>
+  <script src="equipment-dashboard.js"></script>
+  <script src="usage-data.js"></script>
+  <script src="usage-dashboard.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const session = requireSession(ROLES.ADMIN);
+      if (session) {
+        initEquipmentDashboard(session);
+        initUsageDashboard(session);
+      }
+    });
+  </script>
+</body>
+</html>

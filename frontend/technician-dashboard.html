@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Technician Dashboard · Gym Equipment Maintenance System</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="dash-nav">
+    <div class="brand d-flex align-items-center gap-2">
+      <div class="brand-mark">G</div>
+      <span class="brand-name">Gym Equipment Maintenance System</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn-change-password" id="changePasswordBtn">Change Password</button>
+      <button class="btn-logout" id="logoutBtn">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="dash-center">
+    <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+  </main>
+
+  <!-- ---------- Change Password modal (shared markup — see script.js#initChangePasswordModal) ---------- -->
+  <div class="eq-modal-backdrop" id="changePasswordBackdrop" hidden></div>
+
+  <div class="eq-modal" id="changePasswordModal" hidden role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="changePasswordTitle">Change Password</h3>
+        <button type="button" class="eq-modal-close" id="changePasswordCloseBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="changePasswordForm" novalidate>
+        <div id="changePasswordAlert"></div>
+
+        <div class="mb-3">
+          <label class="form-label" for="currentPassword">Current Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="currentPassword"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="currentPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="newPassword">New Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="newPassword"
+              autocomplete="new-password"
+              placeholder="At least 8 characters"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="newPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="confirmNewPassword">Confirm New Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="confirmNewPassword"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="confirmNewPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="eq-modal-actions">
+          <button type="button" class="btn-tag-outline" id="changePasswordCancelBtn">Cancel</button>
+          <button type="submit" class="btn-tag eq-modal-save" id="changePasswordSaveBtn">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => requireSession("TECHNICIAN"));
+  </script>
+</body>
+</html>

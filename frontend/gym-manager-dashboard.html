@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Manager Dashboard · Gym Equipment Maintenance System</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="dash-nav">
+    <div class="brand d-flex align-items-center gap-2">
+      <div class="brand-mark">G</div>
+      <span class="brand-name">Gym Equipment Maintenance System</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn-change-password" id="changePasswordBtn">Change Password</button>
+      <button class="btn-logout" id="logoutBtn">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="dash-center">
+    <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+  </main>
+
+  <!-- ============================================================
+       Usage Monitoring — Gym Manager view: same dashboard as Admin,
+       plus the Batch Usage Logging screen (this role is the "staff"
+       who enters usage data — POST/PUT are Gym-Manager-only, see
+       SecurityConfig).
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="eq-section-title">Usage Monitoring</p>
+        <p class="eq-subtitle">Number of usage sessions logged per equipment, per day.</p>
+      </div>
+    </div>
+
+    <!-- ---------- A. Summary cards ---------- -->
+    <section class="eq-summary-grid" id="usageSummaryCards" aria-label="Usage summary"></section>
+
+    <!-- ---------- Batch Usage Logging — the primary data-entry screen ---------- -->
+    <section class="eq-panel">
+      <div class="eq-panel-header-row">
+        <div>
+          <h2 class="eq-panel-title">Batch Usage Logging</h2>
+          <p class="eq-panel-subtitle">Pick a zone and date, enter sessions for every machine, save them all at once.</p>
+        </div>
+        <div class="eq-toolbar">
+          <select id="usageBatchZoneSelect" class="eq-filter-select" aria-label="Zone">
+            <option value="" selected disabled>Select zone</option>
+          </select>
+          <input type="date" id="usageBatchDateInput" class="eq-filter-select" aria-label="Date" />
+        </div>
+      </div>
+      <div id="usageBatchAlert"></div>
+      <div class="eq-table-wrap">
+        <table class="eq-table">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="usageBatchBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="usageBatchEmpty">Select a zone to log sessions for its equipment.</p>
+      </div>
+      <div class="eq-modal-actions eq-batch-actions">
+        <button type="button" class="btn-tag eq-modal-save" id="usageBatchSaveBtn">Save All Sessions</button>
+      </div>
+    </section>
+
+    <!-- ---------- B. Usage table ---------- -->
+    <section class="eq-panel">
+      <div class="eq-panel-header-row">
+        <div>
+          <h2 class="eq-panel-title">Usage Table</h2>
+          <p class="eq-panel-subtitle">Session counts for the selected date.</p>
+        </div>
+        <div class="eq-toolbar">
+          <select id="usageZoneFilter" class="eq-filter-select" aria-label="Filter by zone">
+            <option value="">All Zones</option>
+          </select>
+          <input type="date" id="usageDateFilter" class="eq-filter-select" aria-label="Date" />
+        </div>
+      </div>
+      <div class="eq-table-wrap">
+        <table class="eq-table">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Zone</th>
+              <th>Sessions</th>
+              <th>Usage Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usageTableBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="usageTableEmpty" hidden>No equipment matches that filter.</p>
+      </div>
+    </section>
+
+    <div class="eq-grid-2">
+      <!-- ---------- C. Usage history / trend ---------- -->
+      <section class="eq-panel">
+        <div class="eq-panel-header-row">
+          <div>
+            <h2 class="eq-panel-title">Usage History</h2>
+            <p class="eq-panel-subtitle">
+              <span id="usageHistoryTrendLabel"></span>
+            </p>
+          </div>
+          <div class="eq-toolbar eq-toolbar-tight">
+            <select id="usageHistoryEquipmentSelect" class="eq-filter-select" aria-label="Equipment"></select>
+            <select id="usageHistoryGroupBySelect" class="eq-filter-select" aria-label="Daily, weekly, or monthly">
+              <option value="day">Daily</option>
+              <option value="week">Weekly</option>
+              <option value="month">Monthly</option>
+            </select>
+          </div>
+        </div>
+        <div class="eq-trend-chart" id="usageHistoryChart" aria-label="Usage trend chart"></div>
+        <div class="eq-table-wrap">
+          <table class="eq-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sessions</th>
+              </tr>
+            </thead>
+            <tbody id="usageHistoryBody"></tbody>
+          </table>
+          <p class="eq-empty-state" id="usageHistoryEmpty" hidden>No usage history for this equipment yet.</p>
+        </div>
+      </section>
+
+      <!-- ---------- D. Top used equipment ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Top Used Equipment</h2>
+        <p class="eq-panel-subtitle">Ranked by total sessions over the last 30 days.</p>
+        <div id="usageTopList" aria-label="Top used equipment"></div>
+        <p class="eq-empty-state" id="usageTopEmpty" hidden>No usage logged yet.</p>
+      </section>
+    </div>
+  </main>
+
+  <div class="eq-toast" id="usageToast" role="status" aria-live="polite"></div>
+
+  <!-- ---------- Delete confirmation modal (unused for Manager — kept for a shared init path, never opened since no delete buttons render for this role) ---------- -->
+  <div class="eq-modal-backdrop" id="usageModalBackdrop" hidden></div>
+  <div class="eq-modal eq-modal-confirm" id="usageDeleteModal" hidden role="dialog" aria-modal="true" aria-labelledby="usageDeleteTitle">
+    <div class="eq-modal-dialog eq-modal-dialog-sm">
+      <h3 id="usageDeleteTitle">Delete usage record?</h3>
+      <p id="usageDeleteMessage">Are you sure you want to delete this usage record?</p>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline" id="usageDeleteCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag-danger" id="usageDeleteConfirmBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+<!-- ---------- Change Password modal (shared markup — see script.js#initChangePasswordModal) ---------- -->
+  <div class="eq-modal-backdrop" id="changePasswordBackdrop" hidden></div>
+
+  <div class="eq-modal" id="changePasswordModal" hidden role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="changePasswordTitle">Change Password</h3>
+        <button type="button" class="eq-modal-close" id="changePasswordCloseBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="changePasswordForm" novalidate>
+        <div id="changePasswordAlert"></div>
+
+        <div class="mb-3">
+          <label class="form-label" for="currentPassword">Current Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="currentPassword"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="currentPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="newPassword">New Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="newPassword"
+              autocomplete="new-password"
+              placeholder="At least 8 characters"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="newPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="confirmNewPassword">Confirm New Password</label>
+          <div class="password-field">
+            <input
+              type="password"
+              class="form-control"
+              id="confirmNewPassword"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="confirmNewPassword"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M6.53 6.53C3.9 8.2 1.5 12 1.5 12s3.5 7 10.5 7c1.9 0 3.53-.5 4.88-1.24M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 10.5 7 10.5 7-.44.9-1.1 1.98-2 3.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="eq-modal-actions">
+          <button type="button" class="btn-tag-outline" id="changePasswordCancelBtn">Cancel</button>
+          <button type="submit" class="btn-tag eq-modal-save" id="changePasswordSaveBtn">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <script src="script.js"></script>
+  <script src="equipment-data.js"></script>
+  <script src="usage-data.js"></script>
+  <script src="usage-dashboard.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const session = requireSession("GYM_MANAGER");
+      if (session) initUsageDashboard(session);
+    });
+  </script>
+</body>
+</html>
