@@ -6,13 +6,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * One equipment's session count for one day. (equipment, usageDate) is
- * the business key — at most one record per equipment per day, updated
- * in place rather than re-logged, so historical days are never lost or
- * duplicated.
+ * One equipment's TOTAL USAGE HOURS for one day, manually entered by the
+ * Gym Manager. (equipment, usageDate) is the business key — at most one
+ * record per equipment per day, updated in place rather than re-logged,
+ * so historical days are never lost or duplicated.
  *
- * Deliberately just a session count: no hours, no start/end time, no
- * meter readings, no operating-hours or session-of-day concept.
+ * Deliberately just a daily hours reading: no sessions, no start/end
+ * time, no IoT/sensor/meter data, no automatic tracking of any kind.
  */
 @Entity
 @Table(name = "usage_record", uniqueConstraints = @UniqueConstraint(columnNames = {"equipment_id", "usage_date"}))
@@ -29,8 +29,11 @@ public class UsageRecord {
     @Column(name = "usage_date", nullable = false)
     private LocalDate usageDate;
 
-    @Column(name = "session_count", nullable = false)
-    private int sessionCount;
+    @Column(name = "usage_hours", nullable = false)
+    private double usageHours;
+
+    @Column(name = "notes", length = 255)
+    private String notes;
 
     /** Username of whoever last saved this record — audit trail only, not an ownership restriction. */
     @Column(name = "recorded_by", nullable = false, length = 20)
@@ -64,8 +67,11 @@ public class UsageRecord {
     public LocalDate getUsageDate() { return usageDate; }
     public void setUsageDate(LocalDate usageDate) { this.usageDate = usageDate; }
 
-    public int getSessionCount() { return sessionCount; }
-    public void setSessionCount(int sessionCount) { this.sessionCount = sessionCount; }
+    public double getUsageHours() { return usageHours; }
+    public void setUsageHours(double usageHours) { this.usageHours = usageHours; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
     public String getRecordedBy() { return recordedBy; }
     public void setRecordedBy(String recordedBy) { this.recordedBy = recordedBy; }

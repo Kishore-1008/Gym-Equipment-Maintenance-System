@@ -1108,3 +1108,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   justify-content: flex-end;
   margin-top: 1rem;
 }
+
+/* ---------- Usage Monitoring: Today's / This Month's Usage rows ---------- */
+.eq-usage-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--steel-200);
+}
+
+.eq-usage-row:last-child { border-bottom: none; }
+
+/* ---------- Usage Monitoring: viewing-date row + highlight note ---------- */
+.eq-usage-view-row {
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+.eq-usage-highlight-note {
+  margin-top: -0.6rem;
+  margin-bottom: 1.5rem;
+}

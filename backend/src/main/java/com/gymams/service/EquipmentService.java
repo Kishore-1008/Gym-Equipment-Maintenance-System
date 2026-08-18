@@ -48,6 +48,7 @@ public class EquipmentService {
         equipment.setCategory(EquipmentCatalog.categoryFor(name));
         equipment.setMaintenanceInterval(interval);
         equipment.setStatus(status);
+        equipment.setMaintenanceUsageLimitHours(request.getMaintenanceUsageLimitHours());
 
         return toResponse(equipmentRepository.save(equipment));
     }
@@ -69,6 +70,7 @@ public class EquipmentService {
         equipment.setCategory(EquipmentCatalog.categoryFor(name));
         equipment.setMaintenanceInterval(interval);
         equipment.setStatus(status);
+        equipment.setMaintenanceUsageLimitHours(request.getMaintenanceUsageLimitHours());
 
         return toResponse(equipmentRepository.save(equipment));
     }
@@ -132,7 +134,8 @@ public class EquipmentService {
                 e.getEquipmentName(),
                 e.getCategory(),
                 e.getMaintenanceInterval().name(),
-                e.getStatus().name()
+                e.getStatus().name(),
+                e.getMaintenanceUsageLimitHours()
         );
     }
 }

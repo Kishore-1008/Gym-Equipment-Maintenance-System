@@ -1,11 +1,10 @@
 package com.gymams.service;
 
 import com.gymams.dto.BatchUsageRequest;
-import com.gymams.dto.TopUsageResponse;
-import com.gymams.dto.UsageHistoryPointResponse;
+import com.gymams.dto.EquipmentUsageResponse;
+import com.gymams.dto.UsageDashboardResponse;
 import com.gymams.dto.UsageRecordRequest;
 import com.gymams.dto.UsageRecordResponse;
-import com.gymams.dto.UsageSummaryResponse;
 import com.gymams.exception.ApiException;
 import com.gymams.model.Equipment;
 import com.gymams.model.UsageRecord;
@@ -17,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,8 +25,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Usage Monitoring — daily USAGE HOURS entered manually by the Gym
+ * Manager (no sessions, no sensors/IoT, no timers). Backs:
+ *   - Today's Usage / This Month's Usage
+ *   - Most/Least Used Equipment (today and this month)
+ *   - Batch Usage Entry
+ *   - Usage-based preventive maintenance status (separate from Module 4
+ *     repair/damage tracking)
+ */
 @Service
 public class UsageService {
+
+    private static final DateTimeFormatter MONTH_LABEL = DateTimeFormatter.ofPattern("MMMM yyyy");
 
     private final UsageRecordRepository usageRecordRepository;
     private final EquipmentRepository equipmentRepository;
@@ -38,13 +48,13 @@ public class UsageService {
     }
 
     /* ============================================================
-       B. Usage Table — every piece of equipment (optionally filtered
-       by zone) for one selected date. Equipment with no logged
-       record yet for that date still appears, at 0 sessions, rather
-       than being silently omitted.
+       Usage Table — every piece of equipment for one selected date.
+       Equipment with no logged reading yet for that date still
+       appears, at 0 hours, rather than being silently omitted. Used
+       both to render a plain table and to prefill the batch-entry form.
        ============================================================ */
 
-    public List<UsageRecordResponse> tableForDate(String zone, LocalDate date) {
+    public List<UsageRecordResponse> tableForDate(LocalDate date) {
         LocalDate effectiveDate = date != null ? date : LocalDate.now();
 
         Map<String, UsageRecord> byEquipmentCode = usageRecordRepository
@@ -52,117 +62,80 @@ public class UsageService {
                 .collect(Collectors.toMap(r -> r.getEquipment().getEquipmentCode(), r -> r));
 
         return equipmentRepository.findAllByOrderByEquipmentCodeAsc().stream()
-                .filter(eq -> zone == null || zone.isBlank() || eq.getCategory().equalsIgnoreCase(zone))
                 .map(eq -> {
                     UsageRecord record = byEquipmentCode.get(eq.getEquipmentCode());
-                    if (record != null) {
-                        return toResponse(record);
-                    }
-                    return syntheticZeroResponse(eq, effectiveDate);
+                    return record != null ? toResponse(record) : syntheticZeroResponse(eq, effectiveDate);
                 })
                 .collect(Collectors.toList());
     }
 
     /* ============================================================
-       A. Summary cards — gym-wide stats for one selected date.
+       Dashboard — everything the Usage Monitoring screen needs for
+       one selected date: per-equipment today/month hours + maintenance
+       status, plus the four most/least-used highlights. No lifetime
+       usage statistic is ever produced here.
        ============================================================ */
 
-    public UsageSummaryResponse summary(LocalDate date) {
-        List<UsageRecordResponse> table = tableForDate(null, date);
+    public UsageDashboardResponse dashboard(LocalDate date) {
         LocalDate effectiveDate = date != null ? date : LocalDate.now();
+        LocalDate monthStart = effectiveDate.withDayOfMonth(1);
+        LocalDate monthEnd = effectiveDate.withDayOfMonth(effectiveDate.lengthOfMonth());
 
-        int totalSessions = table.stream().mapToInt(UsageRecordResponse::getSessionCount).sum();
-        int totalEquipment = table.size();
+        Map<String, Double> todayByEquipment = usageRecordRepository
+                .findAllByUsageDateOrderByEquipment_EquipmentCodeAsc(effectiveDate).stream()
+                .collect(Collectors.toMap(r -> r.getEquipment().getEquipmentCode(), UsageRecord::getUsageHours));
 
-        Optional<UsageRecordResponse> most = table.stream()
-                .max(Comparator.comparingInt(UsageRecordResponse::getSessionCount));
-        Optional<UsageRecordResponse> least = table.stream()
-                .min(Comparator.comparingInt(UsageRecordResponse::getSessionCount));
+        Map<String, Double> monthByEquipment = usageRecordRepository
+                .findAllByUsageDateBetweenOrderByUsageDateDesc(monthStart, monthEnd).stream()
+                .collect(Collectors.groupingBy(r -> r.getEquipment().getEquipmentCode(),
+                        Collectors.summingDouble(UsageRecord::getUsageHours)));
 
-        return new UsageSummaryResponse(
+        List<Equipment> allEquipment = equipmentRepository.findAllByOrderByEquipmentCodeAsc();
+
+        List<EquipmentUsageResponse> rows = allEquipment.stream()
+                .map(eq -> {
+                    double today = todayByEquipment.getOrDefault(eq.getEquipmentCode(), 0.0);
+                    double month = monthByEquipment.getOrDefault(eq.getEquipmentCode(), 0.0);
+                    // Preventive-maintenance status is checked against the current
+                    // MONTH's total only — there is a single configured limit per
+                    // equipment, not separate daily/monthly thresholds.
+                    UsageStatus status = UsageStatus.fromUsage(month, eq.getMaintenanceUsageLimitHours());
+
+                    return new EquipmentUsageResponse(
+                            eq.getEquipmentCode(), eq.getEquipmentName(), eq.getCategory(),
+                            today, month,
+                            eq.getMaintenanceUsageLimitHours(),
+                            status.name()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        Optional<EquipmentUsageResponse> mostToday = rows.stream()
+                .max(Comparator.comparingDouble(EquipmentUsageResponse::getTodayUsageHours));
+        Optional<EquipmentUsageResponse> leastToday = rows.stream()
+                .min(Comparator.comparingDouble(EquipmentUsageResponse::getTodayUsageHours));
+        Optional<EquipmentUsageResponse> mostMonth = rows.stream()
+                .max(Comparator.comparingDouble(EquipmentUsageResponse::getMonthUsageHours));
+        Optional<EquipmentUsageResponse> leastMonth = rows.stream()
+                .min(Comparator.comparingDouble(EquipmentUsageResponse::getMonthUsageHours));
+
+        return new UsageDashboardResponse(
                 effectiveDate.toString(),
-                totalSessions,
-                totalEquipment,
-                most.map(UsageRecordResponse::getEquipmentId).orElse(null),
-                most.map(UsageRecordResponse::getEquipmentName).orElse(null),
-                most.map(UsageRecordResponse::getSessionCount).orElse(null),
-                least.map(UsageRecordResponse::getEquipmentId).orElse(null),
-                least.map(UsageRecordResponse::getEquipmentName).orElse(null),
-                least.map(UsageRecordResponse::getSessionCount).orElse(null)
+                monthStart.format(MONTH_LABEL),
+                rows,
+                mostToday.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
+                mostToday.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
+                mostToday.map(EquipmentUsageResponse::getTodayUsageHours).orElse(null),
+                leastToday.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
+                leastToday.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
+                leastToday.map(EquipmentUsageResponse::getTodayUsageHours).orElse(null),
+                mostMonth.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
+                mostMonth.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
+                mostMonth.map(EquipmentUsageResponse::getMonthUsageHours).orElse(null),
+                leastMonth.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
+                leastMonth.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
+                leastMonth.map(EquipmentUsageResponse::getMonthUsageHours).orElse(null)
         );
-    }
-
-    /* ============================================================
-       C. Usage History / Trend — one equipment, across many days,
-       optionally grouped into weekly or monthly totals.
-       ============================================================ */
-
-    public List<UsageHistoryPointResponse> history(String equipmentId, String groupBy, int days) {
-        Equipment equipment = findEquipment(equipmentId);
-        LocalDate to = LocalDate.now();
-        LocalDate from = to.minusDays(Math.max(days, 1) - 1L);
-
-        List<UsageRecord> records = usageRecordRepository
-                .findAllByEquipment_EquipmentCodeIgnoreCaseAndUsageDateBetweenOrderByUsageDateAsc(
-                        equipment.getEquipmentCode(), from, to);
-
-        String normalizedGroupBy = groupBy == null ? "day" : groupBy.toLowerCase();
-
-        if ("week".equals(normalizedGroupBy)) {
-            Map<String, Integer> byWeek = new java.util.TreeMap<>();
-            for (UsageRecord r : records) {
-                String key = r.getUsageDate().get(IsoFields.WEEK_BASED_YEAR) + "-W"
-                        + String.format("%02d", r.getUsageDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR));
-                byWeek.merge(key, r.getSessionCount(), Integer::sum);
-            }
-            List<UsageHistoryPointResponse> points = byWeek.entrySet().stream()
-                    .map(e -> new UsageHistoryPointResponse(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
-            java.util.Collections.reverse(points);
-            return points;
-        }
-
-        if ("month".equals(normalizedGroupBy)) {
-            Map<String, Integer> byMonth = new java.util.TreeMap<>();
-            for (UsageRecord r : records) {
-                String key = r.getUsageDate().toString().substring(0, 7); // YYYY-MM
-                byMonth.merge(key, r.getSessionCount(), Integer::sum);
-            }
-            List<UsageHistoryPointResponse> points = byMonth.entrySet().stream()
-                    .map(e -> new UsageHistoryPointResponse(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
-            java.util.Collections.reverse(points);
-            return points;
-        }
-
-        // day (default): most recent first
-        List<UsageRecord> desc = new ArrayList<>(records);
-        desc.sort(Comparator.comparing(UsageRecord::getUsageDate).reversed());
-        return desc.stream()
-                .map(r -> new UsageHistoryPointResponse(r.getUsageDate().toString(), r.getSessionCount()))
-                .collect(Collectors.toList());
-    }
-
-    /* ============================================================
-       D. Top Used Equipment — ranked by total sessions over a window.
-       ============================================================ */
-
-    public List<TopUsageResponse> topUsed(int days, int limit) {
-        LocalDate to = LocalDate.now();
-        LocalDate from = to.minusDays(Math.max(days, 1) - 1L);
-
-        Map<Equipment, Integer> totals = usageRecordRepository
-                .findAllByUsageDateBetweenOrderByUsageDateDesc(from, to).stream()
-                .collect(Collectors.groupingBy(UsageRecord::getEquipment,
-                        Collectors.summingInt(UsageRecord::getSessionCount)));
-
-        return totals.entrySet().stream()
-                .sorted((a, b) -> b.getValue() - a.getValue())
-                .limit(Math.max(limit, 1))
-                .map(e -> new TopUsageResponse(
-                        e.getKey().getEquipmentCode(), e.getKey().getEquipmentName(),
-                        e.getKey().getCategory(), e.getValue()))
-                .collect(Collectors.toList());
     }
 
     /* ============================================================
@@ -170,14 +143,14 @@ public class UsageService {
        ============================================================ */
 
     /**
-     * Create-or-update by (equipment, date): if a record already exists
+     * Create-or-update by (equipment, date): if a reading already exists
      * for that day it is updated in place, never duplicated.
      */
     @Transactional
     public UsageRecordResponse upsert(UsageRecordRequest request, String recordedBy) {
         Equipment equipment = findEquipment(request.getEquipmentId());
         LocalDate date = parseDateOrToday(request.getUsageDate());
-        int sessionCount = requireNonNegative(request.getSessionCount());
+        double usageHours = requireNonNegative(request.getUsageHours());
 
         UsageRecord record = usageRecordRepository
                 .findByEquipment_EquipmentCodeIgnoreCaseAndUsageDate(equipment.getEquipmentCode(), date)
@@ -185,16 +158,17 @@ public class UsageService {
 
         record.setEquipment(equipment);
         record.setUsageDate(date);
-        record.setSessionCount(sessionCount);
+        record.setUsageHours(usageHours);
+        record.setNotes(request.getNotes());
         record.setRecordedBy(recordedBy);
 
         return toResponse(usageRecordRepository.save(record));
     }
 
     /**
-     * Batch save — one date, many equipment/session-count pairs, all in
-     * one transaction. Lets a Gym Manager log an entire zone without
-     * navigating to separate equipment pages.
+     * Batch save — one date, many equipment/usage-hours pairs, all in one
+     * transaction. Lets a Gym Manager log every machine's hours for the
+     * day on a single screen instead of visiting separate equipment pages.
      */
     @Transactional
     public List<UsageRecordResponse> batchUpsert(BatchUsageRequest request, String recordedBy) {
@@ -203,7 +177,7 @@ public class UsageService {
 
         for (BatchUsageRequest.Entry entry : request.getEntries()) {
             Equipment equipment = findEquipment(entry.getEquipmentId());
-            int sessionCount = requireNonNegative(entry.getSessionCount());
+            double usageHours = requireNonNegative(entry.getUsageHours());
 
             UsageRecord record = usageRecordRepository
                     .findByEquipment_EquipmentCodeIgnoreCaseAndUsageDate(equipment.getEquipmentCode(), date)
@@ -211,7 +185,8 @@ public class UsageService {
 
             record.setEquipment(equipment);
             record.setUsageDate(date);
-            record.setSessionCount(sessionCount);
+            record.setUsageHours(usageHours);
+            record.setNotes(entry.getNotes());
             record.setRecordedBy(recordedBy);
 
             saved.add(toResponse(usageRecordRepository.save(record)));
@@ -220,13 +195,14 @@ public class UsageService {
         return saved;
     }
 
-    /** Edits an existing record's session count only — equipment and date are the record's identity. */
+    /** Edits an existing reading's usage hours only — equipment and date are the record's identity. */
     @Transactional
     public UsageRecordResponse updateById(Long id, UsageRecordRequest request, String requestedBy) {
         UsageRecord record = usageRecordRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usage record not found."));
 
-        record.setSessionCount(requireNonNegative(request.getSessionCount()));
+        record.setUsageHours(requireNonNegative(request.getUsageHours()));
+        if (request.getNotes() != null) record.setNotes(request.getNotes());
         record.setRecordedBy(requestedBy);
 
         return toResponse(usageRecordRepository.save(record));
@@ -256,9 +232,9 @@ public class UsageService {
         }
     }
 
-    private int requireNonNegative(Integer value) {
+    private double requireNonNegative(Double value) {
         if (value == null || value < 0) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Session count must be zero or greater.");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Usage hours must be zero or greater.");
         }
         return value;
     }
@@ -270,15 +246,15 @@ public class UsageService {
                 r.getEquipment().getEquipmentName(),
                 r.getEquipment().getCategory(),
                 r.getUsageDate().toString(),
-                r.getSessionCount(),
-                UsageStatus.fromSessionCount(r.getSessionCount()).name(),
+                r.getUsageHours(),
+                r.getNotes(),
                 r.getRecordedBy(),
                 r.getRecordedAt().toString(),
                 r.getUpdatedAt() == null ? null : r.getUpdatedAt().toString()
         );
     }
 
-    /** No record logged yet for this equipment/date — shown as 0 sessions rather than omitted. */
+    /** No reading logged yet for this equipment/date — shown as 0 hours rather than omitted. */
     private UsageRecordResponse syntheticZeroResponse(Equipment eq, LocalDate date) {
         return new UsageRecordResponse(
                 null,
@@ -286,8 +262,8 @@ public class UsageService {
                 eq.getEquipmentName(),
                 eq.getCategory(),
                 date.toString(),
-                0,
-                UsageStatus.NOT_USED.name(),
+                0.0,
+                null,
                 null,
                 null,
                 null

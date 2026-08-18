@@ -6,67 +6,57 @@
    equipment-data.js: every function returns a Promise and talks
    to the Spring Boot API via apiRequest() (from script.js).
 
-   Usage here is purely a SESSION COUNT per equipment per day —
-   no hours, no start/end time, no meter readings.
+   Usage here is a manually-entered TOTAL USAGE HOURS reading per
+   equipment per day — no sessions, no IoT/sensors, no start/end
+   timers, no QR tracking.
 
    Shared by both the Admin and Gym Manager dashboards — role
-   differences (who can log/edit/delete) are handled in
+   differences (who can log usage) are handled in
    usage-dashboard.js, not here.
    ============================================================ */
 
 const USAGE_STATUS_LABELS = {
-  NOT_USED: "Not Used",
   NORMAL: "Normal",
-  HIGH: "High",
+  NEAR_LIMIT: "Approaching Limit",
+  MAINTENANCE_DUE: "Maintenance Recommended",
 };
 
 function usageStatusLabel(code) {
-  return USAGE_STATUS_LABELS[code] || code;
+  return USAGE_STATUS_LABELS[code] || code || "Normal";
 }
 
 /* ------------------------------------------------------------
    API access
    ------------------------------------------------------------ */
 
-/** GET /api/usage — the Usage Table for one date, optionally filtered by zone. Admin + Gym Manager. */
-async function fetchUsageTable({ zone = "", date = "" } = {}) {
-  const params = new URLSearchParams();
-  if (zone) params.set("zone", zone);
-  if (date) params.set("date", date);
-  const qs = params.toString();
-
-  const list = await apiRequest(`/usage${qs ? `?${qs}` : ""}`, { method: "GET" });
+/** GET /api/usage — every equipment's reading for one date (0 hrs if not yet logged). Admin + Gym Manager. */
+async function fetchUsageTable(date = "") {
+  const qs = date ? `?date=${encodeURIComponent(date)}` : "";
+  const list = await apiRequest(`/usage${qs}`, { method: "GET" });
   return list.map(fromApiUsageRecord);
 }
 
-/** GET /api/usage/summary — summary cards for one date. Admin + Gym Manager. */
-async function fetchUsageSummary(date = "") {
+/**
+ * GET /api/usage/dashboard — everything the Usage Monitoring screen needs
+ * for one date: today's hours, this month's hours, most/least used
+ * (today & month) and each equipment's usage-based maintenance status.
+ * Admin + Gym Manager.
+ */
+async function fetchUsageDashboard(date = "") {
   const qs = date ? `?date=${encodeURIComponent(date)}` : "";
-  return apiRequest(`/usage/summary${qs}`, { method: "GET" });
-}
-
-/** GET /api/usage/history — one equipment's usage over time, optionally grouped by week/month. Admin + Gym Manager. */
-async function fetchUsageHistory(equipmentId, { groupBy = "day", days = 30 } = {}) {
-  const params = new URLSearchParams({ equipmentId, groupBy, days: String(days) });
-  return apiRequest(`/usage/history?${params.toString()}`, { method: "GET" });
-}
-
-/** GET /api/usage/top — Top Used Equipment ranking. Admin + Gym Manager. */
-async function fetchTopUsedEquipment({ days = 30, limit = 5 } = {}) {
-  const params = new URLSearchParams({ days: String(days), limit: String(limit) });
-  return apiRequest(`/usage/top?${params.toString()}`, { method: "GET" });
+  return apiRequest(`/usage/dashboard${qs}`, { method: "GET" });
 }
 
 /** POST /api/usage — single upsert. Gym Manager only (enforced server-side). */
-async function saveUsageRecord({ equipmentId, usageDate, sessionCount }) {
+async function saveUsageRecord({ equipmentId, usageDate, usageHours, notes }) {
   const saved = await apiRequest("/usage", {
     method: "POST",
-    body: JSON.stringify({ equipmentId, usageDate, sessionCount }),
+    body: JSON.stringify({ equipmentId, usageDate, usageHours, notes }),
   });
   return fromApiUsageRecord(saved);
 }
 
-/** POST /api/usage/batch — save an entire zone's sessions for one date in one call. Gym Manager only. */
+/** POST /api/usage/batch — save every machine's hours for one date in one call. Gym Manager only. */
 async function saveUsageBatch({ usageDate, entries }) {
   const saved = await apiRequest("/usage/batch", {
     method: "POST",
@@ -75,11 +65,11 @@ async function saveUsageBatch({ usageDate, entries }) {
   return saved.map(fromApiUsageRecord);
 }
 
-/** PUT /api/usage/{id} — edit an existing record's session count. Gym Manager only. */
-async function updateUsageRecord(id, { sessionCount }) {
+/** PUT /api/usage/{id} — edit an existing reading's usage hours. Gym Manager only. */
+async function updateUsageRecord(id, { usageHours, notes }) {
   const updated = await apiRequest(`/usage/${encodeURIComponent(id)}`, {
     method: "PUT",
-    body: JSON.stringify({ sessionCount }),
+    body: JSON.stringify({ usageHours, notes }),
   });
   return fromApiUsageRecord(updated);
 }
@@ -95,10 +85,10 @@ function fromApiUsageRecord(item) {
     id: item.id,
     equipmentId: item.equipmentId,
     equipmentName: item.equipmentName,
-    zone: item.zone,
+    category: item.category,
     usageDate: item.usageDate,
-    sessionCount: item.sessionCount,
-    status: item.status,
+    usageHours: item.usageHours,
+    notes: item.notes,
     recordedBy: item.recordedBy,
     recordedAt: item.recordedAt,
     updatedAt: item.updatedAt,

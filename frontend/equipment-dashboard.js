@@ -362,6 +362,7 @@ function openAddModal() {
   document.getElementById("eqFieldCategory").value = "";
   document.getElementById("eqFieldInterval").value = "";
   document.getElementById("eqFieldStatus").value = EQUIPMENT_STATUS.OPERATIONAL;
+  document.getElementById("eqFieldUsageLimit").value = "";
   document.getElementById("eqModalSaveBtn").textContent = "Save Equipment";
 
   showModal(document.getElementById("eqModal"));
@@ -381,6 +382,7 @@ function openEditModal(equipmentId) {
   document.getElementById("eqFieldCategory").value = item.category;
   document.getElementById("eqFieldInterval").value = item.maintenanceInterval;
   document.getElementById("eqFieldStatus").value = item.status;
+  document.getElementById("eqFieldUsageLimit").value = item.maintenanceUsageLimitHours ?? "";
   document.getElementById("eqModalSaveBtn").textContent = "Save Changes";
 
   showModal(document.getElementById("eqModal"));
@@ -412,9 +414,15 @@ function wireEquipmentModal() {
     const equipmentName = document.getElementById("eqFieldName").value;
     const maintenanceInterval = document.getElementById("eqFieldInterval").value;
     const status = document.getElementById("eqFieldStatus").value;
+    const usageLimitRaw = document.getElementById("eqFieldUsageLimit").value;
+    const maintenanceUsageLimitHours = usageLimitRaw === "" ? null : Number(usageLimitRaw);
 
     if (!equipmentName || !maintenanceInterval || !status) {
       showAlert(alertBox, "Please fill in every field.");
+      return;
+    }
+    if (maintenanceUsageLimitHours !== null && maintenanceUsageLimitHours < 0) {
+      showAlert(alertBox, "Maintenance usage limit can't be negative.");
       return;
     }
 
@@ -425,10 +433,10 @@ function wireEquipmentModal() {
 
     try {
       if (modalMode === "add") {
-        const created = await createEquipment({ equipmentName, maintenanceInterval, status });
+        const created = await createEquipment({ equipmentName, maintenanceInterval, status, maintenanceUsageLimitHours });
         showToast(`${created.id} added.`);
       } else {
-        const updated = await updateEquipment(modalEditingId, { equipmentName, maintenanceInterval, status });
+        const updated = await updateEquipment(modalEditingId, { equipmentName, maintenanceInterval, status, maintenanceUsageLimitHours });
         showToast(`${updated.id} updated.`);
       }
       closeEquipmentModal();

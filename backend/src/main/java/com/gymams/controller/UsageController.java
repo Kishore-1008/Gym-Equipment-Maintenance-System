@@ -1,11 +1,9 @@
 package com.gymams.controller;
 
 import com.gymams.dto.BatchUsageRequest;
-import com.gymams.dto.TopUsageResponse;
-import com.gymams.dto.UsageHistoryPointResponse;
+import com.gymams.dto.UsageDashboardResponse;
 import com.gymams.dto.UsageRecordRequest;
 import com.gymams.dto.UsageRecordResponse;
-import com.gymams.dto.UsageSummaryResponse;
 import com.gymams.exception.ApiException;
 import com.gymams.service.UsageService;
 import jakarta.validation.Valid;
@@ -33,35 +31,20 @@ public class UsageController {
         this.usageService = usageService;
     }
 
-    /** B. Usage Table — GET /api/usage?zone=&date= */
+    /** Usage Table for one date — GET /api/usage?date= (also used to prefill batch entry). */
     @GetMapping
-    public List<UsageRecordResponse> table(
-            @RequestParam(required = false) String zone,
-            @RequestParam(required = false) String date) {
-        return usageService.tableForDate(zone, parseDate(date));
+    public List<UsageRecordResponse> table(@RequestParam(required = false) String date) {
+        return usageService.tableForDate(parseDate(date));
     }
 
-    /** A. Summary cards — GET /api/usage/summary?date= */
-    @GetMapping("/summary")
-    public UsageSummaryResponse summary(@RequestParam(required = false) String date) {
-        return usageService.summary(parseDate(date));
-    }
-
-    /** C. Usage History / Trend — GET /api/usage/history?equipmentId=&groupBy=day|week|month&days= */
-    @GetMapping("/history")
-    public List<UsageHistoryPointResponse> history(
-            @RequestParam String equipmentId,
-            @RequestParam(defaultValue = "day") String groupBy,
-            @RequestParam(defaultValue = "30") int days) {
-        return usageService.history(equipmentId, groupBy, days);
-    }
-
-    /** D. Top Used Equipment — GET /api/usage/top?days=&limit= */
-    @GetMapping("/top")
-    public List<TopUsageResponse> top(
-            @RequestParam(defaultValue = "30") int days,
-            @RequestParam(defaultValue = "5") int limit) {
-        return usageService.topUsed(days, limit);
+    /**
+     * Usage Monitoring dashboard — GET /api/usage/dashboard?date=
+     * Today's usage, this month's usage, most/least used (today & month),
+     * and each equipment's usage-based maintenance status, all in one call.
+     */
+    @GetMapping("/dashboard")
+    public UsageDashboardResponse dashboard(@RequestParam(required = false) String date) {
+        return usageService.dashboard(parseDate(date));
     }
 
     /** Single upsert — GYM_MANAGER only. */
@@ -71,14 +54,14 @@ public class UsageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usageService.upsert(request, authentication.getName()));
     }
 
-    /** Batch upsert for a whole zone in one screen — GYM_MANAGER only. */
+    /** Batch upsert so a Gym Manager can log every machine's hours for the day in one screen — GYM_MANAGER only. */
     @PostMapping("/batch")
     public ResponseEntity<List<UsageRecordResponse>> saveBatch(@Valid @RequestBody BatchUsageRequest request,
                                                                  Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usageService.batchUpsert(request, authentication.getName()));
     }
 
-    /** Edit a single existing record's session count — GYM_MANAGER only. */
+    /** Edit a single existing reading's usage hours — GYM_MANAGER only. */
     @PutMapping("/{id}")
     public UsageRecordResponse update(@PathVariable Long id,
                                        @Valid @RequestBody UsageRecordRequest request,
