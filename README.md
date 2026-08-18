@@ -133,6 +133,10 @@ If nothing is returned, port 8080 is free.
 
 > **Do not kill a process blindly. Always identify the PID with `tasklist` first so that you do not stop an unrelated application.**
 
+### Before starting the backend
+Run this command
+$env:DB_PASSWORD="your_actual_mysql_password"
+
 ### 4. Start the backend
 
 Open PowerShell in the `backend` directory:
