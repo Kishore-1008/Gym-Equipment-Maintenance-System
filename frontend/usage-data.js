@@ -17,8 +17,8 @@
 
 const USAGE_STATUS_LABELS = {
   NORMAL: "Normal",
-  NEAR_LIMIT: "Approaching Limit",
-  MAINTENANCE_DUE: "Maintenance Recommended",
+  NEAR_LIMIT: "Maintenance Due Soon",
+  MAINTENANCE_DUE: "Maintenance Due",
 };
 
 function usageStatusLabel(code) {

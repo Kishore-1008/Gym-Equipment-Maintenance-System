@@ -129,7 +129,7 @@
     <div class="eq-header">
       <div class="eq-header-text">
         <p class="eq-section-title">Usage Monitoring</p>
-        <p class="eq-subtitle">Total usage hours logged per equipment, per day. Read-only here — the Gym Manager logs usage; the maintenance usage limit is configured on each equipment's Add/Edit form above.</p>
+        <p class="eq-subtitle">Total usage hours logged per equipment, per day. Read-only here — the Gym Manager logs usage; daily/monthly limits are configured on each equipment's Add/Edit form above.</p>
       </div>
     </div>
 
@@ -139,16 +139,23 @@
       <input type="date" id="usageViewDate" class="eq-filter-select" aria-label="Viewing date" />
     </div>
 
-    <!-- ---------- Most / Least used highlight cards ---------- -->
-    <section class="eq-summary-grid" aria-label="Most and least used equipment">
+    <!-- ---------- TODAY: Most / Least Used ---------- -->
+    <div class="eq-usage-period-heading">
+      <h2 class="eq-usage-period-title">Today</h2>
+    </div>
+    <section class="eq-summary-grid eq-summary-grid-2" aria-label="Most and least used equipment today">
       <div class="eq-card eq-card-ok" id="usageMostToday"></div>
       <div class="eq-card eq-card-warn" id="usageLeastToday"></div>
+    </section>
+
+    <!-- ---------- THIS MONTH: Most / Least Used ---------- -->
+    <div class="eq-usage-period-heading">
+      <h2 class="eq-usage-period-title">This Month <span class="eq-usage-period-sub" id="usageMonthLabel"></span></h2>
+    </div>
+    <section class="eq-summary-grid eq-summary-grid-2" aria-label="Most and least used equipment this month">
       <div class="eq-card eq-card-ok" id="usageMostMonth"></div>
       <div class="eq-card eq-card-warn" id="usageLeastMonth"></div>
     </section>
-    <p class="eq-data-note eq-usage-highlight-note">
-      Most / Least used today (first row) and most / least used this month, <span id="usageMonthLabel"></span> (second row).
-    </p>
 
     <div class="eq-grid-2">
       <!-- ---------- Today's Usage ---------- -->
@@ -177,7 +184,7 @@
               <th>Equipment</th>
               <th>Today</th>
               <th>This Month</th>
-              <th>Maintenance Limit</th>
+              <th>Monthly Limit</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -233,14 +240,16 @@
           <select class="form-select" id="eqFieldStatus" required></select>
         </div>
 
-        <!-- ---------- Usage-based preventive maintenance limit (Usage Monitoring) ----------
+        <!-- ---------- Monthly usage limit (usage-based preventive maintenance) ----------
              Admin-only, optional. Separate from Status above: this only drives the
-             usage-hours maintenance recommendation shown in Usage Monitoring (checked
-             against the equipment's current-month usage total), never actual
-             damage/repair state (that stays in Module 4). Leave blank for no limit. -->
+             Usage Maintenance Status shown in Usage Monitoring (evaluated against the
+             equipment's current-month usage total), never actual damage/repair state
+             (that stays in Module 4) — exceeding it never auto-creates a repair request
+             or assigns a technician. Leave blank for no limit. There is no separate
+             daily limit. -->
         <div class="mb-3">
-          <label class="form-label" for="eqFieldUsageLimit">Maintenance Usage Limit (hours / month)</label>
-          <input type="number" class="form-control" id="eqFieldUsageLimit" min="0" step="0.5" placeholder="Optional, e.g. 200" />
+          <label class="form-label" for="eqFieldMonthlyLimit">Monthly Usage Limit (hours/month)</label>
+          <input type="number" class="form-control" id="eqFieldMonthlyLimit" min="0" step="0.5" placeholder="Optional, e.g. 200" />
         </div>
 
         <div class="eq-modal-actions">

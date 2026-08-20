@@ -1,5 +1,14 @@
 package com.gymams.service;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.gymams.dto.EquipmentRequest;
 import com.gymams.dto.EquipmentResponse;
 import com.gymams.exception.ApiException;
@@ -7,14 +16,7 @@ import com.gymams.model.Equipment;
 import com.gymams.model.EquipmentStatus;
 import com.gymams.model.MaintenanceInterval;
 import com.gymams.repository.EquipmentRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import com.gymams.repository.UsageRecordRepository;
 
 @Service
 public class EquipmentService {
@@ -23,9 +25,14 @@ public class EquipmentService {
     private static final Pattern CODE_PATTERN = Pattern.compile("^EQ(\\d+)$");
 
     private final EquipmentRepository equipmentRepository;
+    private final UsageRecordRepository usageRecordRepository;
 
-    public EquipmentService(EquipmentRepository equipmentRepository) {
+    public EquipmentService(
+            EquipmentRepository equipmentRepository,
+            UsageRecordRepository usageRecordRepository) {
+
         this.equipmentRepository = equipmentRepository;
+        this.usageRecordRepository = usageRecordRepository;
     }
 
     public List<EquipmentResponse> findAll() {
@@ -48,7 +55,7 @@ public class EquipmentService {
         equipment.setCategory(EquipmentCatalog.categoryFor(name));
         equipment.setMaintenanceInterval(interval);
         equipment.setStatus(status);
-        equipment.setMaintenanceUsageLimitHours(request.getMaintenanceUsageLimitHours());
+        equipment.setMonthlyUsageLimitHours(request.getMonthlyUsageLimitHours());
 
         return toResponse(equipmentRepository.save(equipment));
     }
@@ -56,7 +63,10 @@ public class EquipmentService {
     @Transactional
     public EquipmentResponse update(String equipmentCode, EquipmentRequest request) {
         Equipment equipment = equipmentRepository.findByEquipmentCodeIgnoreCase(equipmentCode)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Equipment not found."));
+                .orElseThrow(() -> new ApiException(
+                        HttpStatus.NOT_FOUND,
+                        "Equipment not found."
+                ));
 
         String name = validateName(request.getEquipmentName());
         MaintenanceInterval interval = validateInterval(request.getMaintenanceInterval());
@@ -70,7 +80,7 @@ public class EquipmentService {
         equipment.setCategory(EquipmentCatalog.categoryFor(name));
         equipment.setMaintenanceInterval(interval);
         equipment.setStatus(status);
-        equipment.setMaintenanceUsageLimitHours(request.getMaintenanceUsageLimitHours());
+        equipment.setMonthlyUsageLimitHours(request.getMonthlyUsageLimitHours());
 
         return toResponse(equipmentRepository.save(equipment));
     }
@@ -78,7 +88,15 @@ public class EquipmentService {
     @Transactional
     public void delete(String equipmentCode) {
         Equipment equipment = equipmentRepository.findByEquipmentCodeIgnoreCase(equipmentCode)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Equipment not found."));
+                .orElseThrow(() -> new ApiException(
+                        HttpStatus.NOT_FOUND,
+                        "Equipment not found."
+                ));
+
+        // Delete usage history first because usage_record references this equipment.
+        usageRecordRepository.deleteAllByEquipment_Id(equipment.getId());
+
+        // Now delete the equipment itself.
         equipmentRepository.delete(equipment);
     }
 
@@ -86,7 +104,10 @@ public class EquipmentService {
 
     private String validateName(String name) {
         if (!EquipmentCatalog.isAllowedName(name)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Select a valid equipment name.");
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Select a valid equipment name."
+            );
         }
         return name;
     }
@@ -95,7 +116,10 @@ public class EquipmentService {
         try {
             return MaintenanceInterval.valueOf(interval);
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Select a valid maintenance interval.");
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Select a valid maintenance interval."
+            );
         }
     }
 
@@ -103,7 +127,10 @@ public class EquipmentService {
         try {
             return EquipmentStatus.valueOf(status);
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Select a valid status.");
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Select a valid status."
+            );
         }
     }
 
@@ -135,7 +162,7 @@ public class EquipmentService {
                 e.getCategory(),
                 e.getMaintenanceInterval().name(),
                 e.getStatus().name(),
-                e.getMaintenanceUsageLimitHours()
+                e.getMonthlyUsageLimitHours()
         );
     }
 }

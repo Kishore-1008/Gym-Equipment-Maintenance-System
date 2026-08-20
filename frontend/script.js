@@ -309,6 +309,15 @@ function requireSession(expectedRole) {
     greetingEl.textContent = `Welcome, ${session.fullName}!`;
   }
 
+  // Header user chip ("Name · Role") — present on any dashboard that
+  // includes the element (both Admin and Gym Manager use the same
+  // eq-header layout), populated centrally here so every dashboard
+  // stays consistent without each one wiring it up separately.
+  const chipEl = document.getElementById("eqUserChip");
+  if (chipEl) {
+    chipEl.textContent = `${session.fullName} · ${roleLabel(session.role)}`;
+  }
+
   // User-info card — full name, username, role, read straight from the
   // session (itself built from the backend's login response, never
   // hardcoded per dashboard).

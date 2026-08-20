@@ -29,15 +29,15 @@ public class Equipment {
     private EquipmentStatus status;
 
     /**
-     * Single preventive-maintenance usage-hour threshold, configured by the
-     * Admin only (never entered by the Gym Manager), checked against the
-     * equipment's CURRENT MONTH usage total. Null means no limit has been
-     * configured yet, in which case usage-based maintenance status is always
-     * NORMAL — this is deliberately separate from EquipmentStatus above,
-     * which reflects actual damage/repair state (Module 4).
+     * Preventive-maintenance usage-hour threshold for the current month,
+     * configured by the Admin only (never entered by the Gym Manager).
+     * Null means no limit has been configured yet, in which case
+     * usage-based maintenance status is always NORMAL — this is
+     * deliberately separate from EquipmentStatus above, which reflects
+     * actual damage/repair state (Module 4).
      */
     @Column(name = "maintenance_usage_limit_hours")
-    private Double maintenanceUsageLimitHours;
+    private Double monthlyUsageLimitHours;
 
     public Equipment() {}
 
@@ -59,6 +59,6 @@ public class Equipment {
     public EquipmentStatus getStatus() { return status; }
     public void setStatus(EquipmentStatus status) { this.status = status; }
 
-    public Double getMaintenanceUsageLimitHours() { return maintenanceUsageLimitHours; }
-    public void setMaintenanceUsageLimitHours(Double maintenanceUsageLimitHours) { this.maintenanceUsageLimitHours = maintenanceUsageLimitHours; }
+    public Double getMonthlyUsageLimitHours() { return monthlyUsageLimitHours; }
+    public void setMonthlyUsageLimitHours(Double monthlyUsageLimitHours) { this.monthlyUsageLimitHours = monthlyUsageLimitHours; }
 }

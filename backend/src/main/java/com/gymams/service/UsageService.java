@@ -3,6 +3,7 @@ package com.gymams.service;
 import com.gymams.dto.BatchUsageRequest;
 import com.gymams.dto.EquipmentUsageResponse;
 import com.gymams.dto.UsageDashboardResponse;
+import com.gymams.dto.UsageHighlightResponse;
 import com.gymams.dto.UsageRecordRequest;
 import com.gymams.dto.UsageRecordResponse;
 import com.gymams.exception.ApiException;
@@ -19,7 +20,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,46 +96,56 @@ public class UsageService {
                 .map(eq -> {
                     double today = todayByEquipment.getOrDefault(eq.getEquipmentCode(), 0.0);
                     double month = monthByEquipment.getOrDefault(eq.getEquipmentCode(), 0.0);
-                    // Preventive-maintenance status is checked against the current
-                    // MONTH's total only — there is a single configured limit per
-                    // equipment, not separate daily/monthly thresholds.
-                    UsageStatus status = UsageStatus.fromUsage(month, eq.getMaintenanceUsageLimitHours());
+                    UsageStatus status = UsageStatus.fromUsage(month, eq.getMonthlyUsageLimitHours());
 
                     return new EquipmentUsageResponse(
                             eq.getEquipmentCode(), eq.getEquipmentName(), eq.getCategory(),
                             today, month,
-                            eq.getMaintenanceUsageLimitHours(),
+                            eq.getMonthlyUsageLimitHours(),
                             status.name()
                     );
                 })
                 .collect(Collectors.toList());
 
-        Optional<EquipmentUsageResponse> mostToday = rows.stream()
-                .max(Comparator.comparingDouble(EquipmentUsageResponse::getTodayUsageHours));
-        Optional<EquipmentUsageResponse> leastToday = rows.stream()
-                .min(Comparator.comparingDouble(EquipmentUsageResponse::getTodayUsageHours));
-        Optional<EquipmentUsageResponse> mostMonth = rows.stream()
-                .max(Comparator.comparingDouble(EquipmentUsageResponse::getMonthUsageHours));
-        Optional<EquipmentUsageResponse> leastMonth = rows.stream()
-                .min(Comparator.comparingDouble(EquipmentUsageResponse::getMonthUsageHours));
+        Optional<Double> maxToday = rows.stream().map(EquipmentUsageResponse::getTodayUsageHours).max(Double::compare);
+        Optional<Double> minToday = rows.stream().map(EquipmentUsageResponse::getTodayUsageHours).min(Double::compare);
+        Optional<Double> maxMonth = rows.stream().map(EquipmentUsageResponse::getMonthUsageHours).max(Double::compare);
+        Optional<Double> minMonth = rows.stream().map(EquipmentUsageResponse::getMonthUsageHours).min(Double::compare);
+
+        List<UsageHighlightResponse> mostUsedToday = highlightsAt(rows, EquipmentUsageResponse::getTodayUsageHours, maxToday);
+        List<UsageHighlightResponse> leastUsedToday = highlightsAt(rows, EquipmentUsageResponse::getTodayUsageHours, minToday);
+        List<UsageHighlightResponse> mostUsedMonth = highlightsAt(rows, EquipmentUsageResponse::getMonthUsageHours, maxMonth);
+        List<UsageHighlightResponse> leastUsedMonth = highlightsAt(rows, EquipmentUsageResponse::getMonthUsageHours, minMonth);
 
         return new UsageDashboardResponse(
                 effectiveDate.toString(),
                 monthStart.format(MONTH_LABEL),
                 rows,
-                mostToday.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
-                mostToday.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
-                mostToday.map(EquipmentUsageResponse::getTodayUsageHours).orElse(null),
-                leastToday.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
-                leastToday.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
-                leastToday.map(EquipmentUsageResponse::getTodayUsageHours).orElse(null),
-                mostMonth.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
-                mostMonth.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
-                mostMonth.map(EquipmentUsageResponse::getMonthUsageHours).orElse(null),
-                leastMonth.map(EquipmentUsageResponse::getEquipmentId).orElse(null),
-                leastMonth.map(EquipmentUsageResponse::getEquipmentName).orElse(null),
-                leastMonth.map(EquipmentUsageResponse::getMonthUsageHours).orElse(null)
+                mostUsedToday,
+                leastUsedToday,
+                mostUsedMonth,
+                leastUsedMonth
         );
+    }
+
+    /**
+     * Every equipment whose value (today's hours or month's hours) equals the
+     * winning value — not just the first one found. This is what makes ties
+     * show up as multiple entries instead of Stream.max()/min() silently
+     * collapsing them to a single arbitrary equipment. Values are compared
+     * to the nearest 0.01 hour so that floating-point summation of daily
+     * readings (e.g. repeated 0.1-hour entries) can't hide a genuine tie.
+     */
+    private List<UsageHighlightResponse> highlightsAt(List<EquipmentUsageResponse> rows,
+                                                        java.util.function.ToDoubleFunction<EquipmentUsageResponse> hoursOf,
+                                                        Optional<Double> winningValue) {
+        if (winningValue.isEmpty()) return List.of();
+        long target = Math.round(winningValue.get() * 100);
+
+        return rows.stream()
+                .filter(r -> Math.round(hoursOf.applyAsDouble(r) * 100) == target)
+                .map(r -> new UsageHighlightResponse(r.getEquipmentId(), r.getEquipmentName(), hoursOf.applyAsDouble(r)))
+                .collect(Collectors.toList());
     }
 
     /* ============================================================

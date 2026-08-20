@@ -18,14 +18,11 @@
       <span class="brand-name">Gym Equipment Maintenance System</span>
     </div>
     <div class="d-flex align-items-center gap-3">
+      <span class="eq-user-chip" id="eqUserChip">—</span>
       <button class="btn-change-password" id="changePasswordBtn">Change Password</button>
       <button class="btn-logout" id="logoutBtn">Log Out</button>
     </div>
   </nav>
-
-  <main class="dash-center">
-    <p class="dash-greeting" id="dashGreeting">Welcome!</p>
-  </main>
 
   <!-- ============================================================
        Usage Monitoring — Gym Manager view: manually log each
@@ -39,8 +36,8 @@
 
     <div class="eq-header">
       <div class="eq-header-text">
-        <p class="eq-section-title">Usage Monitoring</p>
-        <p class="eq-subtitle">Total usage hours logged per equipment, per day.</p>
+        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+        <p class="eq-subtitle">Usage Monitoring — total usage hours logged per equipment, per day.</p>
       </div>
     </div>
 
@@ -78,16 +75,23 @@
       <input type="date" id="usageViewDate" class="eq-filter-select" aria-label="Viewing date" />
     </div>
 
-    <!-- ---------- Most / Least used highlight cards ---------- -->
-    <section class="eq-summary-grid" aria-label="Most and least used equipment">
+    <!-- ---------- TODAY: Most / Least Used ---------- -->
+    <div class="eq-usage-period-heading">
+      <h2 class="eq-usage-period-title">Today</h2>
+    </div>
+    <section class="eq-summary-grid eq-summary-grid-2" aria-label="Most and least used equipment today">
       <div class="eq-card eq-card-ok" id="usageMostToday"></div>
       <div class="eq-card eq-card-warn" id="usageLeastToday"></div>
+    </section>
+
+    <!-- ---------- THIS MONTH: Most / Least Used ---------- -->
+    <div class="eq-usage-period-heading">
+      <h2 class="eq-usage-period-title">This Month <span class="eq-usage-period-sub" id="usageMonthLabel"></span></h2>
+    </div>
+    <section class="eq-summary-grid eq-summary-grid-2" aria-label="Most and least used equipment this month">
       <div class="eq-card eq-card-ok" id="usageMostMonth"></div>
       <div class="eq-card eq-card-warn" id="usageLeastMonth"></div>
     </section>
-    <p class="eq-data-note eq-usage-highlight-note">
-      Most / Least used today (first row) and most / least used this month, <span id="usageMonthLabel"></span> (second row).
-    </p>
 
     <div class="eq-grid-2">
       <!-- ---------- Today's Usage ---------- -->
@@ -116,7 +120,7 @@
               <th>Equipment</th>
               <th>Today</th>
               <th>This Month</th>
-              <th>Maintenance Limit</th>
+              <th>Monthly Limit</th>
               <th>Status</th>
             </tr>
           </thead>

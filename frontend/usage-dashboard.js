@@ -100,26 +100,30 @@ function renderUsageHoursList(elementId, rows, hoursKey, emptyMessage) {
 }
 
 /* ============================================================
-   Most/Least Used highlight cards
+   Most/Least Used highlight cards — each can hold MULTIPLE
+   equipment when several are tied for the highest (or lowest)
+   usage; every tied equipment is shown, never just the first one.
    ============================================================ */
 
 /** elementId is the .eq-card container itself — this owns both its class and its content. */
-function renderHighlightCard(elementId, name, id, hours, accent) {
+function renderHighlightCard(elementId, entries, accent) {
   const el = document.getElementById(elementId);
   if (!el) return;
 
   el.classList.remove("eq-card-ok", "eq-card-warn", "eq-card-danger", "eq-card-info");
   el.classList.add(`eq-card-${accent}`);
 
-  if (!name) {
+  if (!entries || entries.length === 0) {
     el.innerHTML = `<span class="eq-card-value eq-card-value-sm">—</span><span class="eq-card-label">No usage logged yet</span>`;
     return;
   }
 
-  el.innerHTML = `
-    <span class="eq-card-value eq-card-value-sm">${equipmentLabel(name, id)}</span>
-    <span class="eq-card-label">${formatHours(hours)}</span>
-  `;
+  el.innerHTML = entries.map((entry) => `
+    <div class="eq-highlight-entry">
+      <span class="eq-card-value eq-card-value-sm">${equipmentLabel(entry.equipmentName, entry.equipmentId)}</span>
+      <span class="eq-card-label">${formatHours(entry.hours)}</span>
+    </div>
+  `).join("");
 }
 
 /* ============================================================
@@ -140,14 +144,14 @@ function renderMaintenanceStatusTable(rows) {
 
   el.innerHTML = rows.map((r) => {
     const accent = usageStatusAccent(r.maintenanceStatus);
-    const limit = r.maintenanceUsageLimitHours != null ? formatHours(r.maintenanceUsageLimitHours) : "No limit set";
+    const limitLabel = r.monthlyUsageLimitHours != null ? formatHours(r.monthlyUsageLimitHours) : "No limit set";
 
     return `
       <tr>
         <td>${equipmentLabel(r.equipmentName, r.equipmentId)}</td>
         <td>${formatHours(r.todayUsageHours)}</td>
         <td>${formatHours(r.monthUsageHours)}</td>
-        <td>${limit}</td>
+        <td>${limitLabel}</td>
         <td><span class="eq-badge eq-badge-${accent}">${escapeHtml(usageStatusLabel(r.maintenanceStatus))}</span></td>
       </tr>
     `;
@@ -166,10 +170,10 @@ async function refreshUsageDashboard() {
     renderUsageHoursList("usageTodayList", rows, "todayUsageHours", "No usage logged for today yet.");
     renderUsageHoursList("usageMonthList", rows, "monthUsageHours", "No usage logged this month yet.");
 
-    renderHighlightCard("usageMostToday", dashboard.mostUsedTodayEquipmentName, dashboard.mostUsedTodayEquipmentId, dashboard.mostUsedTodayHours, "ok");
-    renderHighlightCard("usageLeastToday", dashboard.leastUsedTodayEquipmentName, dashboard.leastUsedTodayEquipmentId, dashboard.leastUsedTodayHours, "warn");
-    renderHighlightCard("usageMostMonth", dashboard.mostUsedMonthEquipmentName, dashboard.mostUsedMonthEquipmentId, dashboard.mostUsedMonthHours, "ok");
-    renderHighlightCard("usageLeastMonth", dashboard.leastUsedMonthEquipmentName, dashboard.leastUsedMonthEquipmentId, dashboard.leastUsedMonthHours, "warn");
+    renderHighlightCard("usageMostToday", dashboard.mostUsedToday, "ok");
+    renderHighlightCard("usageLeastToday", dashboard.leastUsedToday, "warn");
+    renderHighlightCard("usageMostMonth", dashboard.mostUsedMonth, "ok");
+    renderHighlightCard("usageLeastMonth", dashboard.leastUsedMonth, "warn");
 
     renderMaintenanceStatusTable(rows);
 

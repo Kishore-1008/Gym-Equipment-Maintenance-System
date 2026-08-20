@@ -15,12 +15,12 @@ public class EquipmentRequest {
     private String status;
 
     /**
-     * Optional preventive-maintenance usage-hour limit — Admin only, checked
-     * against the equipment's current-month usage total. Null/omitted clears
-     * the limit (usage status stays NORMAL).
+     * Optional monthly usage-hour limit — Admin only, configured on the
+     * Add/Edit Equipment form. Null/omitted means no limit configured
+     * (usage status stays NORMAL). There is no separate daily limit.
      */
-    @DecimalMin(value = "0", inclusive = true, message = "Maintenance usage limit can't be negative.")
-    private Double maintenanceUsageLimitHours;
+    @DecimalMin(value = "0", inclusive = true, message = "Monthly usage limit can't be negative.")
+    private Double monthlyUsageLimitHours;
 
     public String getEquipmentName() { return equipmentName; }
     public void setEquipmentName(String equipmentName) { this.equipmentName = equipmentName; }
@@ -31,6 +31,6 @@ public class EquipmentRequest {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public Double getMaintenanceUsageLimitHours() { return maintenanceUsageLimitHours; }
-    public void setMaintenanceUsageLimitHours(Double maintenanceUsageLimitHours) { this.maintenanceUsageLimitHours = maintenanceUsageLimitHours; }
+    public Double getMonthlyUsageLimitHours() { return monthlyUsageLimitHours; }
+    public void setMonthlyUsageLimitHours(Double monthlyUsageLimitHours) { this.monthlyUsageLimitHours = monthlyUsageLimitHours; }
 }

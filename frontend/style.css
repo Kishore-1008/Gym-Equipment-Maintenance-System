@@ -544,6 +544,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .eq-card-danger{ border-left-color: var(--alert-red); }
 .eq-card-info  { border-left-color: var(--steel-blue); }
 
+/* ---------- Highlight cards holding multiple tied equipment ----------
+   A Most/Least Used card can hold more than one .eq-highlight-entry when
+   several pieces of equipment are tied for the same usage total; each
+   entry keeps the card's normal value/label stack, with a light divider
+   between entries so ties are still easy to read at a glance. */
+.eq-highlight-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.eq-highlight-entry + .eq-highlight-entry {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--steel-200);
+}
+
 /* ---------- Panels (shared shell for health / attention / overview) ---------- */
 .eq-grid-2 {
   display: grid;
@@ -1121,13 +1138,42 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 .eq-usage-row:last-child { border-bottom: none; }
 
-/* ---------- Usage Monitoring: viewing-date row + highlight note ---------- */
+/* ---------- Usage Monitoring: viewing-date row ---------- */
 .eq-usage-view-row {
   align-items: center;
   margin-bottom: 0.9rem;
 }
 
-.eq-usage-highlight-note {
-  margin-top: -0.6rem;
-  margin-bottom: 1.5rem;
+/* ---------- Usage Monitoring: TODAY / THIS MONTH section headings ----------
+   Sits directly above its own Most/Least Used card pair so the time period
+   reads as a heading for those cards, not as small print underneath them. */
+.eq-usage-period-heading {
+  margin-bottom: 0.6rem;
+}
+
+.eq-usage-period-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--steel-200);
+}
+
+.eq-usage-period-sub {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-muted);
+}
+
+/* Today's / this month's Most-Least grids are 2-up (not the 4-up layout
+   used for equipment summary cards elsewhere) and sit closer together
+   since each pair is already grouped under its own period heading. */
+.eq-summary-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 1.75rem;
 }

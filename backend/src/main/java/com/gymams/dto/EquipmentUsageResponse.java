@@ -1,12 +1,11 @@
 package com.gymams.dto;
 
 /**
- * One equipment's usage-monitoring row: today's hours, this month's
- * accumulated hours, the single Admin-configured maintenance usage limit
- * (checked against the current month total), and the derived
- * preventive-maintenance status (NORMAL / NEAR_LIMIT / MAINTENANCE_DUE).
- * This status is purely usage-based and never reflects actual damage —
- * that is tracked separately by Module 4 (Repair Request Management).
+ * One row of the Usage Monitoring table: EQUIPMENT | TODAY | THIS MONTH |
+ * MAINTENANCE LIMIT | STATUS. The derived maintenanceStatus compares
+ * monthUsageHours against monthlyUsageLimitHours only — it is purely
+ * usage-based and never reflects actual damage, which Module 4 tracks
+ * separately.
  */
 public class EquipmentUsageResponse {
     private String equipmentId;
@@ -14,19 +13,19 @@ public class EquipmentUsageResponse {
     private String category;
     private double todayUsageHours;
     private double monthUsageHours;
-    private Double maintenanceUsageLimitHours;
+    private Double monthlyUsageLimitHours;
     private String maintenanceStatus;
 
     public EquipmentUsageResponse(String equipmentId, String equipmentName, String category,
                                    double todayUsageHours, double monthUsageHours,
-                                   Double maintenanceUsageLimitHours,
+                                   Double monthlyUsageLimitHours,
                                    String maintenanceStatus) {
         this.equipmentId = equipmentId;
         this.equipmentName = equipmentName;
         this.category = category;
         this.todayUsageHours = todayUsageHours;
         this.monthUsageHours = monthUsageHours;
-        this.maintenanceUsageLimitHours = maintenanceUsageLimitHours;
+        this.monthlyUsageLimitHours = monthlyUsageLimitHours;
         this.maintenanceStatus = maintenanceStatus;
     }
 
@@ -35,6 +34,6 @@ public class EquipmentUsageResponse {
     public String getCategory() { return category; }
     public double getTodayUsageHours() { return todayUsageHours; }
     public double getMonthUsageHours() { return monthUsageHours; }
-    public Double getMaintenanceUsageLimitHours() { return maintenanceUsageLimitHours; }
+    public Double getMonthlyUsageLimitHours() { return monthlyUsageLimitHours; }
     public String getMaintenanceStatus() { return maintenanceStatus; }
 }

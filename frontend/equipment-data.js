@@ -90,19 +90,19 @@ async function fetchEquipment() {
 }
 
 /** POST /api/equipment — ADMIN only (enforced server-side). */
-async function createEquipment({ equipmentName, maintenanceInterval, status, maintenanceUsageLimitHours }) {
+async function createEquipment({ equipmentName, maintenanceInterval, status, monthlyUsageLimitHours }) {
   const created = await apiRequest("/equipment", {
     method: "POST",
-    body: JSON.stringify({ equipmentName, maintenanceInterval, status, maintenanceUsageLimitHours }),
+    body: JSON.stringify({ equipmentName, maintenanceInterval, status, monthlyUsageLimitHours }),
   });
   return fromApiEquipment(created);
 }
 
 /** PUT /api/equipment/{id} — ADMIN only (enforced server-side). */
-async function updateEquipment(equipmentId, { equipmentName, maintenanceInterval, status, maintenanceUsageLimitHours }) {
+async function updateEquipment(equipmentId, { equipmentName, maintenanceInterval, status, monthlyUsageLimitHours }) {
   const updated = await apiRequest(`/equipment/${encodeURIComponent(equipmentId)}`, {
     method: "PUT",
-    body: JSON.stringify({ equipmentName, maintenanceInterval, status, maintenanceUsageLimitHours }),
+    body: JSON.stringify({ equipmentName, maintenanceInterval, status, monthlyUsageLimitHours }),
   });
   return fromApiEquipment(updated);
 }
@@ -120,6 +120,6 @@ function fromApiEquipment(item) {
     category: item.category,
     maintenanceInterval: item.maintenanceInterval,
     status: item.status,
-    maintenanceUsageLimitHours: item.maintenanceUsageLimitHours,
+    monthlyUsageLimitHours: item.monthlyUsageLimitHours,
   };
 }
