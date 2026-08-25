@@ -10,6 +10,15 @@
    Nothing here touches localStorage, login, or registration.
    ============================================================ */
 
+/**
+ * Statuses shown in the "Maintenance Attention" table — deliberately
+ * maintenance-focused (Module 5 concerns), not repair-focused. An
+ * equipment's UNDER_REPAIR status belongs to the separate Repair Request
+ * module (Module 4) and is surfaced there — the Admin already sees it on
+ * the Repair Requests table and the Change Equipment Status panel, so it
+ * doesn't also need to appear here and get visually conflated with
+ * maintenance concerns.
+ */
 const ATTENTION_STATUSES = [
   EQUIPMENT_STATUS.OUT_OF_SERVICE,
   EQUIPMENT_STATUS.MAINTENANCE_DUE,
@@ -40,6 +49,7 @@ function statusAccent(status) {
     case EQUIPMENT_STATUS.OPERATIONAL: return "ok";
     case EQUIPMENT_STATUS.MAINTENANCE_DUE: return "warn";
     case EQUIPMENT_STATUS.UNDER_MAINTENANCE: return "info";
+    case EQUIPMENT_STATUS.UNDER_REPAIR: return "danger";
     case EQUIPMENT_STATUS.OUT_OF_SERVICE: return "danger";
     default: return "info";
   }
@@ -50,6 +60,7 @@ function statusDotEmoji(status) {
     case EQUIPMENT_STATUS.OPERATIONAL: return "🟢";
     case EQUIPMENT_STATUS.MAINTENANCE_DUE: return "🟡";
     case EQUIPMENT_STATUS.UNDER_MAINTENANCE: return "🔵";
+    case EQUIPMENT_STATUS.UNDER_REPAIR: return "🟠";
     case EQUIPMENT_STATUS.OUT_OF_SERVICE: return "🔴";
     default: return "⚪";
   }
@@ -62,6 +73,7 @@ function computeSummary(items) {
     total: items.length,
     operational: items.filter((i) => i.status === EQUIPMENT_STATUS.OPERATIONAL).length,
     maintenanceDue: items.filter((i) => i.status === EQUIPMENT_STATUS.MAINTENANCE_DUE).length,
+    underRepair: items.filter((i) => i.status === EQUIPMENT_STATUS.UNDER_REPAIR).length,
     outOfService: items.filter((i) => i.status === EQUIPMENT_STATUS.OUT_OF_SERVICE).length,
   };
 }
@@ -71,6 +83,7 @@ function computeHealth(items) {
     [EQUIPMENT_STATUS.OPERATIONAL]: 0,
     [EQUIPMENT_STATUS.MAINTENANCE_DUE]: 0,
     [EQUIPMENT_STATUS.UNDER_MAINTENANCE]: 0,
+    [EQUIPMENT_STATUS.UNDER_REPAIR]: 0,
     [EQUIPMENT_STATUS.OUT_OF_SERVICE]: 0,
   };
   items.forEach((i) => { counts[i.status] = (counts[i.status] || 0) + 1; });
@@ -101,6 +114,7 @@ function renderSummaryCards(summary) {
     { label: "Total Equipment", value: summary.total, accent: "info" },
     { label: "Operational", value: summary.operational, accent: "ok" },
     { label: "Maintenance Due", value: summary.maintenanceDue, accent: "warn" },
+    { label: "Under Repair", value: summary.underRepair, accent: "danger" },
     { label: "Out of Service", value: summary.outOfService, accent: "danger" },
   ];
   el.innerHTML = cards.map((c) => `
@@ -118,6 +132,7 @@ function renderHealthOverview(counts, total) {
     { key: EQUIPMENT_STATUS.OPERATIONAL, label: "Operational", accent: "ok" },
     { key: EQUIPMENT_STATUS.MAINTENANCE_DUE, label: "Maintenance Due", accent: "warn" },
     { key: EQUIPMENT_STATUS.UNDER_MAINTENANCE, label: "Under Maintenance", accent: "info" },
+    { key: EQUIPMENT_STATUS.UNDER_REPAIR, label: "Under Repair", accent: "danger" },
     { key: EQUIPMENT_STATUS.OUT_OF_SERVICE, label: "Out of Service", accent: "danger" },
   ];
   el.innerHTML = rows.map((r) => {
@@ -219,6 +234,16 @@ function wireQuickActions() {
         openAddModal();
       } else if (action === "view") {
         document.getElementById("eqOverviewBody")?.closest("section")?.scrollIntoView({ behavior: "smooth" });
+      } else if (action === "schedule") {
+        // Module 5 is implemented — hand off to maintenance-dashboard.js's
+        // real Schedule Maintenance modal instead of the old placeholder.
+        // Falls back to the placeholder only if that script isn't loaded
+        // on this page (defensive, shouldn't happen on Admin Dashboard).
+        if (typeof openScheduleModal === "function") {
+          openScheduleModal();
+        } else {
+          showToast(`${btn.textContent.trim()} isn't built yet — coming in a later module.`);
+        }
       } else {
         showToast(`${btn.textContent.trim()} isn't built yet — coming in a later module.`);
       }

@@ -2,6 +2,7 @@ package com.gymams.controller;
 
 import com.gymams.dto.EquipmentRequest;
 import com.gymams.dto.EquipmentResponse;
+import com.gymams.dto.EquipmentStatusRequest;
 import com.gymams.service.EquipmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,17 @@ public class EquipmentController {
     @PutMapping("/{equipmentId}")
     public EquipmentResponse update(@PathVariable String equipmentId, @Valid @RequestBody EquipmentRequest request) {
         return equipmentService.update(equipmentId, request);
+    }
+
+    /**
+     * Admin's dedicated "Change Equipment Status" action (Module 4) — lets
+     * the Admin move equipment between OPERATIONAL / UNDER_MAINTENANCE /
+     * OUT_OF_SERVICE during the repair workflow without resubmitting the
+     * full Add/Edit Equipment form.
+     */
+    @PatchMapping("/{equipmentId}/status")
+    public EquipmentResponse updateStatus(@PathVariable String equipmentId, @Valid @RequestBody EquipmentStatusRequest request) {
+        return equipmentService.updateStatus(equipmentId, request);
     }
 
     @DeleteMapping("/{equipmentId}")

@@ -41,10 +41,13 @@ public class UsageService {
 
     private final UsageRecordRepository usageRecordRepository;
     private final EquipmentRepository equipmentRepository;
+    private final EquipmentService equipmentService;
 
-    public UsageService(UsageRecordRepository usageRecordRepository, EquipmentRepository equipmentRepository) {
+    public UsageService(UsageRecordRepository usageRecordRepository, EquipmentRepository equipmentRepository,
+                         EquipmentService equipmentService) {
         this.usageRecordRepository = usageRecordRepository;
         this.equipmentRepository = equipmentRepository;
+        this.equipmentService = equipmentService;
     }
 
     /* ============================================================
@@ -159,6 +162,7 @@ public class UsageService {
     @Transactional
     public UsageRecordResponse upsert(UsageRecordRequest request, String recordedBy) {
         Equipment equipment = findEquipment(request.getEquipmentId());
+        equipmentService.requireAvailableForUsage(equipment);
         LocalDate date = parseDateOrToday(request.getUsageDate());
         double usageHours = requireNonNegative(request.getUsageHours());
 
@@ -187,6 +191,7 @@ public class UsageService {
 
         for (BatchUsageRequest.Entry entry : request.getEntries()) {
             Equipment equipment = findEquipment(entry.getEquipmentId());
+            equipmentService.requireAvailableForUsage(equipment);
             double usageHours = requireNonNegative(entry.getUsageHours());
 
             UsageRecord record = usageRecordRepository

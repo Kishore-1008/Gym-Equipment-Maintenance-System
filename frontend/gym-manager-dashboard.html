@@ -25,6 +25,67 @@
   </nav>
 
   <!-- ============================================================
+       Repair Request Management (Module 4) — Gym Manager view:
+       report an actual problem/fault/damage on a piece of equipment
+       and track its status through Admin review and technician
+       repair. Entirely separate from Usage Monitoring below — usage
+       limits never create a repair request automatically.
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+        <p class="eq-subtitle">Repair Requests — report a problem with a piece of equipment and track it through to completion.</p>
+      </div>
+    </div>
+
+    <!-- ---------- Report a Problem ---------- -->
+    <section class="eq-panel eq-panel-compact">
+      <h2 class="eq-panel-title">Report a Problem</h2>
+      <p class="eq-panel-subtitle">Select the equipment with the issue and describe what's wrong.</p>
+      <form id="reportProblemForm" novalidate>
+        <div id="reportProblemAlert"></div>
+        <div class="mb-3">
+          <label class="form-label" for="repairEquipmentSelect">Equipment</label>
+          <select class="form-select" id="repairEquipmentSelect" required>
+            <option value="" selected disabled>Select equipment</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="repairProblemDescription">Problem Description</label>
+          <textarea class="form-control" id="repairProblemDescription" rows="3" placeholder="e.g. The treadmill belt is damaged and making an abnormal noise." required></textarea>
+        </div>
+        <button type="submit" class="btn-tag btn-tag-compact" id="repairSubmitBtn">Submit Repair Request</button>
+      </form>
+    </section>
+
+    <!-- ---------- My Repair Requests ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">My Repair Requests</h2>
+      <p class="eq-panel-subtitle">Track the status of every repair request you've submitted.</p>
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-repair-my">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Equipment</th>
+              <th>Problem</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th>Assigned Technician</th>
+              <th>Rejection Reason</th>
+              <th>Completion Details</th>
+            </tr>
+          </thead>
+          <tbody id="myRepairRequestsBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="myRepairRequestsEmpty" hidden>You haven't submitted any repair requests yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
        Usage Monitoring — Gym Manager view: manually log each
        machine's total usage hours for the day (no sessions, no
        sensors/IoT, no timers), then see today's / this month's
@@ -33,11 +94,10 @@
        see SecurityConfig.
        ============================================================ -->
   <main class="eq-page">
-
     <div class="eq-header">
       <div class="eq-header-text">
-        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
-        <p class="eq-subtitle">Usage Monitoring — total usage hours logged per equipment, per day.</p>
+        <p class="eq-section-title">Usage Monitoring</p>
+        <p class="eq-subtitle">Total usage hours logged per equipment, per day.</p>
       </div>
     </div>
 
@@ -132,6 +192,7 @@
   </main>
 
   <div class="eq-toast" id="usageToast" role="status" aria-live="polite"></div>
+  <div class="eq-toast" id="opsToast" role="status" aria-live="polite"></div>
 
 <!-- ---------- Change Password modal (shared markup — see script.js#initChangePasswordModal) ---------- -->
   <div class="eq-modal-backdrop" id="changePasswordBackdrop" hidden></div>
@@ -246,10 +307,15 @@
   <script src="equipment-data.js"></script>
   <script src="usage-data.js"></script>
   <script src="usage-dashboard.js"></script>
+  <script src="repair-data.js"></script>
+  <script src="repair-dashboard.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession("GYM_MANAGER");
-      if (session) initUsageDashboard(session);
+      if (session) {
+        initUsageDashboard(session);
+        initRepairDashboard(session);
+      }
     });
   </script>
 </body>

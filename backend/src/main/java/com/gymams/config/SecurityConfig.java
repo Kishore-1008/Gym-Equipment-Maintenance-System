@@ -57,11 +57,41 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/equipment/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/equipment/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/equipment/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/equipment/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/equipment/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/usage/**").hasAnyRole("ADMIN", "GYM_MANAGER")
                 .requestMatchers(HttpMethod.POST, "/api/usage/**").hasRole("GYM_MANAGER")
                 .requestMatchers(HttpMethod.PUT, "/api/usage/**").hasRole("GYM_MANAGER")
                 .requestMatchers(HttpMethod.DELETE, "/api/usage/**").hasRole("ADMIN")
+
+                // ---------- Module 4 — Repair Request Management ----------
+                // Gym Manager: report a problem, view own submissions.
+                .requestMatchers(HttpMethod.POST, "/api/repair-requests").hasRole("GYM_MANAGER")
+                .requestMatchers(HttpMethod.GET, "/api/repair-requests/my").hasRole("GYM_MANAGER")
+                // Admin: view all, approve/reject, assign technician.
+                .requestMatchers(HttpMethod.GET, "/api/repair-requests").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/repair-requests/*/approve").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/repair-requests/*/reject").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/repair-requests/*/assign").hasRole("ADMIN")
+                // Technician: view assigned work, progress its status.
+                .requestMatchers(HttpMethod.GET, "/api/repair-requests/assigned").hasRole("TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/repair-requests/*/start").hasRole("TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/repair-requests/*/complete").hasRole("TECHNICIAN")
+
+                // ---------- Module 5 — Maintenance Management ----------
+                // Admin only: schedule, view all, reschedule, cancel. No Gym Manager access.
+                .requestMatchers(HttpMethod.POST, "/api/maintenance").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/maintenance").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/maintenance/*/reschedule").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/maintenance/*/cancel").hasRole("ADMIN")
+                // Technician: view assigned tasks, progress their status.
+                .requestMatchers(HttpMethod.GET, "/api/maintenance/assigned").hasRole("TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/maintenance/*/start").hasRole("TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/maintenance/*/complete").hasRole("TECHNICIAN")
+
+                // ---------- Technician directory (Module 4/5 assignment dropdown) ----------
+                .requestMatchers(HttpMethod.GET, "/api/users/technicians").hasRole("ADMIN")
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -73,7 +103,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(false);
 

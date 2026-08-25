@@ -23,9 +23,104 @@
     </div>
   </nav>
 
-  <main class="dash-center">
-    <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+        <p class="eq-subtitle">Your assigned repair and maintenance work, in one place.</p>
+      </div>
+    </div>
+
+    <!-- ---------- Summary ---------- -->
+    <section class="eq-summary-grid" id="techSummaryCards" aria-label="Task summary"></section>
+
+    <!-- ---------- Assigned Repairs (Module 4) ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Assigned Repairs</h2>
+      <p class="eq-panel-subtitle">Repair requests the Admin has assigned to you.</p>
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-tech-repair">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Problem</th>
+              <th>Status</th>
+              <th>Assigned Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="techRepairBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="techRepairEmpty" hidden>No repairs assigned to you right now.</p>
+      </div>
+    </section>
+
+    <!-- ---------- Assigned Maintenance (Module 5) ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Assigned Maintenance</h2>
+      <p class="eq-panel-subtitle">Scheduled/preventive servicing the Admin has assigned to you.</p>
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-tech-maintenance">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Type</th>
+              <th>Scheduled Date</th>
+              <th>Instructions</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="techMaintenanceBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="techMaintenanceEmpty" hidden>No maintenance assigned to you right now.</p>
+      </div>
+    </section>
   </main>
+
+  <div class="eq-toast" id="opsToast" role="status" aria-live="polite"></div>
+
+  <!-- ---------- Shared modal backdrop for repair/maintenance modals ---------- -->
+  <div class="eq-modal-backdrop" id="opsModalBackdrop" hidden></div>
+
+  <!-- ---------- Repair completion details modal ---------- -->
+  <div class="eq-modal" id="repairCompleteModal" hidden role="dialog" aria-modal="true" aria-labelledby="repairCompleteTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="repairCompleteTitle">Complete Repair</h3>
+        <button type="button" class="eq-modal-close" id="repairCompleteCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="repairCompleteAlert"></div>
+      <div class="mb-3">
+        <label class="form-label" for="repairCompletionDetails">Completion Details</label>
+        <textarea class="form-control" id="repairCompletionDetails" rows="3" placeholder="e.g. Replaced the damaged belt and tested the treadmill successfully." required></textarea>
+      </div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="repairCompleteCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag eq-modal-save btn-tag-compact" id="repairCompleteSaveBtn">Mark Completed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Maintenance completion details modal ---------- -->
+  <div class="eq-modal" id="maintCompleteModal" hidden role="dialog" aria-modal="true" aria-labelledby="maintCompleteTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="maintCompleteTitle">Complete Maintenance</h3>
+        <button type="button" class="eq-modal-close" id="maintCompleteCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="maintCompleteAlert"></div>
+      <div class="mb-3">
+        <label class="form-label" for="maintCompletionDetails">Completion Details</label>
+        <textarea class="form-control" id="maintCompletionDetails" rows="3" placeholder="e.g. Cleaned the machine, lubricated moving components, inspected the belt, and tested normal operation." required></textarea>
+      </div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="maintCompleteCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag eq-modal-save btn-tag-compact" id="maintCompleteSaveBtn">Mark Completed</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ---------- Change Password modal (shared markup — see script.js#initChangePasswordModal) ---------- -->
   <div class="eq-modal-backdrop" id="changePasswordBackdrop" hidden></div>
@@ -137,8 +232,20 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="equipment-data.js"></script>
+  <script src="repair-data.js"></script>
+  <script src="repair-dashboard.js"></script>
+  <script src="maintenance-data.js"></script>
+  <script src="maintenance-dashboard.js"></script>
+  <script src="technician-dashboard.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => requireSession("TECHNICIAN"));
+    document.addEventListener("DOMContentLoaded", () => {
+      const session = requireSession("TECHNICIAN");
+      if (session) {
+        initRepairDashboard(session);
+        initMaintenanceDashboard(session);
+      }
+    });
   </script>
 </body>
 </html>

@@ -199,28 +199,44 @@ function wireDateControl() {
    hours for one date on a single screen.
    ============================================================ */
 
-function renderUsageEntryRows(rows) {
+/** Equipment statuses that block new usage logging — mirrors EquipmentService.requireAvailableForUsage() server-side. */
+const USAGE_BLOCKED_STATUSES = {
+  UNDER_REPAIR: "This equipment is currently under repair and cannot be used.",
+  UNDER_MAINTENANCE: "This equipment is currently under maintenance and cannot be used.",
+  OUT_OF_SERVICE: "This equipment is out of service and cannot be used.",
+};
+
+function renderUsageEntryRows(rows, statusByEquipmentId = {}) {
   const tbody = document.getElementById("usageEntryBody");
   if (!tbody) return;
 
-  tbody.innerHTML = rows.map((r) => `
-    <tr>
-      <td>${equipmentLabel(r.equipmentName, r.equipmentId)}</td>
-      <td>
-        <input type="number" min="0" step="0.1" class="form-control eq-batch-input"
+  tbody.innerHTML = rows.map((r) => {
+    const blockedReason = USAGE_BLOCKED_STATUSES[statusByEquipmentId[r.equipmentId]];
+    const inputCell = blockedReason
+      ? `<input type="number" min="0" step="0.1" class="form-control eq-batch-input"
+               data-usage-equipment="${escapeHtml(r.equipmentId)}"
+               value="${r.usageHours ?? 0}" disabled
+               aria-label="Usage hours for ${escapeHtml(r.equipmentName)}" />
+         <p class="eq-usage-blocked-note">${escapeHtml(blockedReason)}</p>`
+      : `<input type="number" min="0" step="0.1" class="form-control eq-batch-input"
                data-usage-equipment="${escapeHtml(r.equipmentId)}"
                value="${r.usageHours ?? 0}"
-               aria-label="Usage hours for ${escapeHtml(r.equipmentName)}" />
-      </td>
-    </tr>
-  `).join("");
+               aria-label="Usage hours for ${escapeHtml(r.equipmentName)}" />`;
+    return `
+    <tr>
+      <td>${equipmentLabel(r.equipmentName, r.equipmentId)}</td>
+      <td>${inputCell}</td>
+    </tr>`;
+  }).join("");
 }
 
 async function loadUsageEntryForDate() {
   const date = document.getElementById("usageEntryDate")?.value || todayIso();
   try {
-    const rows = await fetchUsageTable(date);
-    renderUsageEntryRows(rows);
+    const [rows, equipment] = await Promise.all([fetchUsageTable(date), fetchEquipment()]);
+    const statusByEquipmentId = {};
+    equipment.forEach((e) => { statusByEquipmentId[e.id] = e.status; });
+    renderUsageEntryRows(rows, statusByEquipmentId);
   } catch (err) {
     showUsageToast(err.message || "Couldn't load equipment for usage entry.");
   }
@@ -240,7 +256,7 @@ function wireUsageEntry() {
     if (alertBox) alertBox.innerHTML = "";
     const usageDate = dateInput.value || todayIso();
 
-    const inputs = document.querySelectorAll("[data-usage-equipment]");
+    const inputs = document.querySelectorAll("[data-usage-equipment]:not(:disabled)");
     const entries = Array.from(inputs).map((input) => ({
       equipmentId: input.getAttribute("data-usage-equipment"),
       usageHours: Number(input.value) || 0,

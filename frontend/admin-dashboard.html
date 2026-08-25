@@ -96,6 +96,7 @@
             <option value="OPERATIONAL">Operational</option>
             <option value="MAINTENANCE_DUE">Maintenance Due</option>
             <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+            <option value="UNDER_REPAIR">Under Repair</option>
             <option value="OUT_OF_SERVICE">Out of Service</option>
           </select>
         </div>
@@ -195,8 +196,260 @@
     </section>
   </main>
 
+  <!-- ============================================================
+       Repair Request Management (Module 4) — Admin view: review
+       Gym-Manager-submitted problem reports, approve/reject
+       (rejection requires a reason), assign a technician once
+       approved, and change equipment status during the repair
+       workflow. Entirely separate from Maintenance Management below.
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="eq-section-title">Repair Request Management</p>
+        <p class="eq-subtitle">Review problems reported by Gym Managers, approve or reject them, and assign a technician.</p>
+      </div>
+    </div>
+
+    <div class="eq-panel-header-row">
+      <p class="eq-panel-subtitle">Filter by status:</p>
+      <select id="repairStatusFilter" class="eq-filter-select" aria-label="Filter repair requests by status">
+        <option value="">All Requests</option>
+        <option value="PENDING">Pending</option>
+        <option value="APPROVED">Approved</option>
+        <option value="REJECTED">Rejected</option>
+        <option value="ASSIGNED">Assigned</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+    </div>
+
+    <section class="eq-panel">
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-repair-admin">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Equipment</th>
+              <th>Problem</th>
+              <th>Status</th>
+              <th>Reported By</th>
+              <th>Submitted</th>
+              <th>Assigned Technician</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminRepairBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="adminRepairEmpty" hidden>No repair requests to show.</p>
+      </div>
+    </section>
+
+    <!-- ---------- Change Equipment Status (repair workflow) ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Change Equipment Status</h2>
+      <p class="eq-panel-subtitle">Under Repair and Under Maintenance are normally set automatically by the repair/maintenance workflow — use this only to correct equipment status manually, or to take equipment Out of Service.</p>
+      <form id="equipmentStatusForm" novalidate>
+        <div id="statusChangeAlert"></div>
+        <div class="eq-form-row">
+          <div class="mb-3">
+            <label class="form-label" for="statusChangeEquipment">Equipment</label>
+            <select class="form-select" id="statusChangeEquipment" required>
+              <option value="" selected disabled>Select equipment</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="statusChangeStatus">New Status</label>
+            <select class="form-select" id="statusChangeStatus" required>
+              <option value="" selected disabled>Select status</option>
+              <option value="OPERATIONAL">Operational</option>
+              <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+              <option value="UNDER_REPAIR">Under Repair</option>
+              <option value="OUT_OF_SERVICE">Out of Service</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-tag-outline btn-tag-compact" id="statusChangeBtn">Update Status</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       Maintenance Management (Module 5) — Admin view: schedule
+       preventive/routine servicing and assign a technician.
+       Entirely Admin-driven — no Gym Manager role here. Never
+       created automatically from usage limits (see Usage
+       Monitoring above) — the Admin always decides.
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="eq-section-title">Maintenance Management</p>
+        <p class="eq-subtitle">Schedule preventive or routine servicing and assign a technician — separate from repair requests.</p>
+      </div>
+      <button type="button" class="btn-tag btn-tag-compact" id="btnScheduleMaintenance">+ Schedule Maintenance</button>
+    </div>
+
+    <section class="eq-panel">
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-maintenance">
+          <thead>
+            <tr>
+              <th>Maintenance ID</th>
+              <th>Equipment</th>
+              <th>Type</th>
+              <th>Scheduled Date</th>
+              <th>Assigned Technician</th>
+              <th>Status</th>
+              <th>Completion Details</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminMaintenanceBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="adminMaintenanceEmpty" hidden>No maintenance records to show.</p>
+      </div>
+    </section>
+  </main>
+
   <div class="eq-toast" id="eqToast" role="status" aria-live="polite"></div>
   <div class="eq-toast" id="usageToast" role="status" aria-live="polite"></div>
+  <div class="eq-toast" id="opsToast" role="status" aria-live="polite"></div>
+
+  <!-- ---------- Shared modal backdrop for repair/maintenance modals ---------- -->
+  <div class="eq-modal-backdrop" id="opsModalBackdrop" hidden></div>
+
+  <!-- ---------- Reject Repair Request modal ---------- -->
+  <div class="eq-modal" id="repairRejectModal" hidden role="dialog" aria-modal="true" aria-labelledby="repairRejectTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="repairRejectTitle">Reject Repair Request</h3>
+        <button type="button" class="eq-modal-close" id="repairRejectCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="repairRejectAlert"></div>
+      <div class="mb-3">
+        <label class="form-label" for="repairRejectReason">Rejection Reason</label>
+        <textarea class="form-control" id="repairRejectReason" rows="3" placeholder="Explain why this request is being rejected." required></textarea>
+      </div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="repairRejectCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag-danger eq-modal-save btn-tag-compact" id="repairRejectSaveBtn">Reject Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Assign Technician (repair) modal ---------- -->
+  <div class="eq-modal" id="repairAssignModal" hidden role="dialog" aria-modal="true" aria-labelledby="repairAssignTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="repairAssignTitle">Assign Technician</h3>
+        <button type="button" class="eq-modal-close" id="repairAssignCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="repairAssignAlert"></div>
+      <div class="mb-3">
+        <label class="form-label" for="repairAssignTechnician">Technician</label>
+        <select class="form-select" id="repairAssignTechnician" required>
+          <option value="" selected disabled>Loading technicians…</option>
+        </select>
+      </div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="repairAssignCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag eq-modal-save btn-tag-compact" id="repairAssignSaveBtn">Assign Technician</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Repair Request View Details modal (read-only) ---------- -->
+  <div class="eq-modal" id="repairDetailsModal" hidden role="dialog" aria-modal="true" aria-labelledby="repairDetailsTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="repairDetailsTitle">Repair Request Details</h3>
+        <button type="button" class="eq-modal-close" id="repairDetailsCloseIconBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="repairDetailsBody"></div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="repairDetailsCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Schedule Maintenance modal ---------- -->
+  <div class="eq-modal" id="maintenanceScheduleModal" hidden role="dialog" aria-modal="true" aria-labelledby="maintScheduleTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="maintScheduleTitle">Schedule Maintenance</h3>
+        <button type="button" class="eq-modal-close" id="maintScheduleCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <form id="maintScheduleForm" novalidate>
+        <div id="maintScheduleAlert"></div>
+        <div class="mb-3">
+          <label class="form-label" for="maintEquipmentSelect">Equipment</label>
+          <select class="form-select" id="maintEquipmentSelect" required>
+            <option value="" selected disabled>Select equipment</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="maintDateInput">Maintenance Date</label>
+            <input type="date" class="form-control" id="maintDateInput" required />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="maintTypeSelect">Maintenance Type</label>
+            <select class="form-select" id="maintTypeSelect" required>
+              <option value="" selected disabled>Select type</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="maintDescriptionInput">Description / Instructions</label>
+          <textarea class="form-control" id="maintDescriptionInput" rows="3" placeholder="Optional notes for the technician."></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="maintTechnicianSelect">Technician</label>
+          <select class="form-select" id="maintTechnicianSelect" required>
+            <option value="" selected disabled>Select technician</option>
+          </select>
+        </div>
+        <div class="eq-modal-actions">
+          <button type="button" class="btn-tag-outline btn-tag-compact" id="maintScheduleCancelBtn">Cancel</button>
+          <button type="submit" class="btn-tag eq-modal-save btn-tag-compact" id="maintScheduleSaveBtn">Schedule Maintenance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- Reschedule Maintenance modal ---------- -->
+  <div class="eq-modal" id="maintRescheduleModal" hidden role="dialog" aria-modal="true" aria-labelledby="maintRescheduleTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="maintRescheduleTitle">Reschedule Maintenance</h3>
+        <button type="button" class="eq-modal-close" id="maintRescheduleCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="maintRescheduleAlert"></div>
+      <div class="mb-3">
+        <label class="form-label" for="maintRescheduleDate">New Maintenance Date</label>
+        <input type="date" class="form-control" id="maintRescheduleDate" required />
+      </div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="maintRescheduleCancelBtn">Cancel</button>
+        <button type="button" class="btn-tag eq-modal-save btn-tag-compact" id="maintRescheduleSaveBtn">Save New Date</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Cancel Maintenance confirm modal ---------- -->
+  <div class="eq-modal eq-modal-confirm" id="maintCancelModal" hidden role="dialog" aria-modal="true" aria-labelledby="maintCancelTitle">
+    <div class="eq-modal-dialog eq-modal-dialog-sm">
+      <h3 id="maintCancelTitle">Cancel Maintenance</h3>
+      <p>Are you sure you want to cancel this maintenance? This won't affect completed maintenance records.</p>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="maintCancelCancelBtn">Keep It</button>
+        <button type="button" class="btn-tag-danger eq-modal-save btn-tag-compact" id="maintCancelConfirmBtn">Cancel Maintenance</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ---------- Add / Edit Equipment modal ---------- -->
   <div class="eq-modal-backdrop" id="eqModalBackdrop" hidden></div>
@@ -386,12 +639,18 @@
   <script src="equipment-dashboard.js"></script>
   <script src="usage-data.js"></script>
   <script src="usage-dashboard.js"></script>
+  <script src="repair-data.js"></script>
+  <script src="repair-dashboard.js"></script>
+  <script src="maintenance-data.js"></script>
+  <script src="maintenance-dashboard.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession(ROLES.ADMIN);
       if (session) {
         initEquipmentDashboard(session);
         initUsageDashboard(session);
+        initRepairDashboard(session);
+        initMaintenanceDashboard(session);
       }
     });
   </script>

@@ -23,6 +23,17 @@ public class User {
     @Column(name = "role", nullable = false, length = 20)
     private Role role;
 
+    /**
+     * Auto-generated business identifier (e.g. TECH001) for TECHNICIAN
+     * accounts only — null/empty for ADMIN and GYM_MANAGER. Generated once
+     * at registration time by UserService and never renumbered, even if
+     * other technicians are later removed. Nullable + unique (MySQL allows
+     * multiple NULLs in a unique column, so ADMIN/GYM_MANAGER rows are
+     * unaffected).
+     */
+    @Column(name = "technician_code", unique = true, length = 10)
+    private String technicianCode;
+
     public User() {}
 
     public User(String fullName, String username, String passwordHash, Role role) {
@@ -46,4 +57,7 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public String getTechnicianCode() { return technicianCode; }
+    public void setTechnicianCode(String technicianCode) { this.technicianCode = technicianCode; }
 }

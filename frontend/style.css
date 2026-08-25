@@ -1177,3 +1177,188 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   margin-bottom: 1.75rem;
 }
+
+/* ============================================================
+   Compact button sizing — Repair Request & Maintenance Management
+   ------------------------------------------------------------
+   Scoped to Module 4/5 action buttons only (per issue report):
+   Submit Repair Request, Schedule Maintenance, the modal Cancel/
+   Save pairs, Assign Technician, Update Status, and completion
+   actions. Does NOT touch the shared .btn-tag/.btn-tag-outline/
+   .btn-tag-danger base rules, so Auth, Equipment Management, and
+   Usage Monitoring buttons are unaffected.
+   ============================================================ */
+.btn-tag-compact {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.62rem 1.2rem;
+  font-size: 0.86rem;
+  min-height: 44px;
+}
+
+.btn-tag.btn-tag-compact,
+.btn-tag-danger.btn-tag-compact {
+  min-height: 48px;
+}
+
+@media (max-width: 480px) {
+  .btn-tag-compact {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   Wide multi-column tables — Repair Requests & Maintenance
+   ------------------------------------------------------------
+   The base .eq-table rules (white-space: nowrap on headers, no
+   defined column widths) work fine for the original, narrower
+   Equipment Overview table, but force a horizontal scrollbar on
+   the wider Repair Request / Maintenance tables, which have more
+   columns and longer free-text content (problem descriptions,
+   completion details). These modifiers give those specific tables
+   a fixed layout with proportional column widths and let long text
+   wrap onto multiple lines instead of forcing extra width.
+   ============================================================ */
+.eq-table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.eq-table-fixed th,
+.eq-table-fixed td {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Admin — Repair Requests (8 cols: ID, Equipment, Problem, Status,
+   Reported By, Submitted, Assigned Technician, Actions) */
+.eq-table-repair-admin th:nth-child(1), .eq-table-repair-admin td:nth-child(1) { width: 6%; }
+.eq-table-repair-admin th:nth-child(2), .eq-table-repair-admin td:nth-child(2) { width: 13%; }
+.eq-table-repair-admin th:nth-child(3), .eq-table-repair-admin td:nth-child(3) { width: 18%; }
+.eq-table-repair-admin th:nth-child(4), .eq-table-repair-admin td:nth-child(4) { width: 9%; }
+.eq-table-repair-admin th:nth-child(5), .eq-table-repair-admin td:nth-child(5) { width: 11%; }
+.eq-table-repair-admin th:nth-child(6), .eq-table-repair-admin td:nth-child(6) { width: 9%; }
+.eq-table-repair-admin th:nth-child(7), .eq-table-repair-admin td:nth-child(7) { width: 12%; }
+.eq-table-repair-admin th:nth-child(8), .eq-table-repair-admin td:nth-child(8) { width: 22%; }
+
+/* Gym Manager — My Repair Requests (8 cols: ID, Equipment, Problem,
+   Status, Submitted, Assigned Technician, Rejection Reason, Completion Details) */
+.eq-table-repair-my th:nth-child(1), .eq-table-repair-my td:nth-child(1) { width: 6%; }
+.eq-table-repair-my th:nth-child(2), .eq-table-repair-my td:nth-child(2) { width: 13%; }
+.eq-table-repair-my th:nth-child(3), .eq-table-repair-my td:nth-child(3) { width: 18%; }
+.eq-table-repair-my th:nth-child(4), .eq-table-repair-my td:nth-child(4) { width: 9%; }
+.eq-table-repair-my th:nth-child(5), .eq-table-repair-my td:nth-child(5) { width: 10%; }
+.eq-table-repair-my th:nth-child(6), .eq-table-repair-my td:nth-child(6) { width: 13%; }
+.eq-table-repair-my th:nth-child(7), .eq-table-repair-my td:nth-child(7) { width: 15%; }
+.eq-table-repair-my th:nth-child(8), .eq-table-repair-my td:nth-child(8) { width: 16%; }
+
+/* Admin — Maintenance (8 cols: ID, Equipment, Type, Scheduled Date,
+   Assigned Technician, Status, Completion Details, Actions) */
+.eq-table-maintenance th:nth-child(1), .eq-table-maintenance td:nth-child(1) { width: 7%; }
+.eq-table-maintenance th:nth-child(2), .eq-table-maintenance td:nth-child(2) { width: 15%; }
+.eq-table-maintenance th:nth-child(3), .eq-table-maintenance td:nth-child(3) { width: 12%; }
+.eq-table-maintenance th:nth-child(4), .eq-table-maintenance td:nth-child(4) { width: 10%; }
+.eq-table-maintenance th:nth-child(5), .eq-table-maintenance td:nth-child(5) { width: 14%; }
+.eq-table-maintenance th:nth-child(6), .eq-table-maintenance td:nth-child(6) { width: 9%; }
+.eq-table-maintenance th:nth-child(7), .eq-table-maintenance td:nth-child(7) { width: 19%; }
+.eq-table-maintenance th:nth-child(8), .eq-table-maintenance td:nth-child(8) { width: 14%; }
+
+/* Technician — Assigned Repairs (5 cols) / Assigned Maintenance (6 cols) */
+.eq-table-tech-repair th:nth-child(1), .eq-table-tech-repair td:nth-child(1) { width: 20%; }
+.eq-table-tech-repair th:nth-child(2), .eq-table-tech-repair td:nth-child(2) { width: 30%; }
+.eq-table-tech-repair th:nth-child(3), .eq-table-tech-repair td:nth-child(3) { width: 15%; }
+.eq-table-tech-repair th:nth-child(4), .eq-table-tech-repair td:nth-child(4) { width: 15%; }
+.eq-table-tech-repair th:nth-child(5), .eq-table-tech-repair td:nth-child(5) { width: 20%; }
+
+.eq-table-tech-maintenance th:nth-child(1), .eq-table-tech-maintenance td:nth-child(1) { width: 18%; }
+.eq-table-tech-maintenance th:nth-child(2), .eq-table-tech-maintenance td:nth-child(2) { width: 14%; }
+.eq-table-tech-maintenance th:nth-child(3), .eq-table-tech-maintenance td:nth-child(3) { width: 13%; }
+.eq-table-tech-maintenance th:nth-child(4), .eq-table-tech-maintenance td:nth-child(4) { width: 23%; }
+.eq-table-tech-maintenance th:nth-child(5), .eq-table-tech-maintenance td:nth-child(5) { width: 12%; }
+.eq-table-tech-maintenance th:nth-child(6), .eq-table-tech-maintenance td:nth-child(6) { width: 20%; }
+
+/* Meaningful, intentional "no action" text instead of a bare dash —
+   styled distinctly from action buttons so it reads as informational,
+   not broken/empty. */
+.eq-actions-cell {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* .eq-table-fixed's word-break/overflow-wrap on td is an inherited CSS
+   property, so without this reset it also applies to button text inside
+   the Actions cell — on a narrow column that broke button labels like
+   "Approve" apart letter by letter instead of wrapping to a new line as
+   a whole word. Buttons keep their text intact and only wrap onto a new
+   line (via .eq-actions-cell's flex-wrap above) if the column is too
+   narrow for both to fit side by side. */
+.eq-actions-cell button {
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  flex: 0 0 auto;
+}
+
+.eq-no-action {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+  white-space: normal;
+}
+
+/* ---------- Repair Request View Details modal ---------- */
+.eq-detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--steel-200);
+}
+
+.eq-detail-row:last-child {
+  border-bottom: none;
+}
+
+.eq-detail-label {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  flex: 0 0 40%;
+}
+
+.eq-detail-value {
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  text-align: right;
+  flex: 1;
+}
+
+/* ============================================================
+   Compact panel — Report a Problem (Issue 5)
+   ------------------------------------------------------------
+   Scoped modifier so only this specific form card gets tighter
+   padding/spacing; other .eq-panel instances elsewhere (Usage
+   Entry, Equipment Overview, etc.) are unaffected.
+   ============================================================ */
+.eq-panel-compact {
+  padding: 1.1rem 1.3rem 1.2rem;
+}
+
+.eq-panel-compact .eq-panel-subtitle {
+  margin-bottom: 0.85rem;
+}
+
+.eq-panel-compact .mb-3 {
+  margin-bottom: 0.85rem !important;
+}
+
+/* Inline reason shown under a disabled Usage Entry input when equipment
+   is unavailable (UNDER_REPAIR / UNDER_MAINTENANCE / OUT_OF_SERVICE). */
+.eq-usage-blocked-note {
+  color: var(--alert-red);
+  font-size: 0.74rem;
+  margin: 0.3rem 0 0;
+}
