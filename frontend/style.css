@@ -1266,19 +1266,76 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .eq-table-maintenance th:nth-child(7), .eq-table-maintenance td:nth-child(7) { width: 19%; }
 .eq-table-maintenance th:nth-child(8), .eq-table-maintenance td:nth-child(8) { width: 14%; }
 
-/* Technician — Assigned Repairs (5 cols) / Assigned Maintenance (6 cols) */
-.eq-table-tech-repair th:nth-child(1), .eq-table-tech-repair td:nth-child(1) { width: 20%; }
-.eq-table-tech-repair th:nth-child(2), .eq-table-tech-repair td:nth-child(2) { width: 30%; }
-.eq-table-tech-repair th:nth-child(3), .eq-table-tech-repair td:nth-child(3) { width: 15%; }
-.eq-table-tech-repair th:nth-child(4), .eq-table-tech-repair td:nth-child(4) { width: 15%; }
-.eq-table-tech-repair th:nth-child(5), .eq-table-tech-repair td:nth-child(5) { width: 20%; }
+/* Admin — Repair History (7 cols: History ID, Request ID, Equipment,
+   Technician, Completed, Cost, Actions) */
+.eq-table-repair-history th:nth-child(1), .eq-table-repair-history td:nth-child(1) { width: 10%; }
+.eq-table-repair-history th:nth-child(2), .eq-table-repair-history td:nth-child(2) { width: 10%; }
+.eq-table-repair-history th:nth-child(3), .eq-table-repair-history td:nth-child(3) { width: 20%; }
+.eq-table-repair-history th:nth-child(4), .eq-table-repair-history td:nth-child(4) { width: 18%; }
+.eq-table-repair-history th:nth-child(5), .eq-table-repair-history td:nth-child(5) { width: 16%; }
+.eq-table-repair-history th:nth-child(6), .eq-table-repair-history td:nth-child(6) { width: 10%; }
+.eq-table-repair-history th:nth-child(7), .eq-table-repair-history td:nth-child(7) { width: 16%; }
 
-.eq-table-tech-maintenance th:nth-child(1), .eq-table-tech-maintenance td:nth-child(1) { width: 18%; }
-.eq-table-tech-maintenance th:nth-child(2), .eq-table-tech-maintenance td:nth-child(2) { width: 14%; }
-.eq-table-tech-maintenance th:nth-child(3), .eq-table-tech-maintenance td:nth-child(3) { width: 13%; }
-.eq-table-tech-maintenance th:nth-child(4), .eq-table-tech-maintenance td:nth-child(4) { width: 23%; }
-.eq-table-tech-maintenance th:nth-child(5), .eq-table-tech-maintenance td:nth-child(5) { width: 12%; }
-.eq-table-tech-maintenance th:nth-child(6), .eq-table-tech-maintenance td:nth-child(6) { width: 20%; }
+/* Technician — Assigned Repairs (5 cols) */
+.eq-table-tech-repair th:nth-child(1),
+.eq-table-tech-repair td:nth-child(1) {
+  width: 18%;
+}
+
+.eq-table-tech-repair th:nth-child(2),
+.eq-table-tech-repair td:nth-child(2) {
+  width: 27%;
+}
+
+.eq-table-tech-repair th:nth-child(3),
+.eq-table-tech-repair td:nth-child(3) {
+  width: 15%;
+}
+
+.eq-table-tech-repair th:nth-child(4),
+.eq-table-tech-repair td:nth-child(4) {
+  width: 17%;
+}
+
+.eq-table-tech-repair th:nth-child(5),
+.eq-table-tech-repair td:nth-child(5) {
+  width: 23%;
+}
+
+/* Keep the Actions column content on one line */
+.eq-table-tech-repair th:nth-child(5),
+.eq-table-tech-repair td:nth-child(5) {
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+/* Action container */
+.eq-table-tech-repair .eq-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* Keep action buttons from breaking */
+.eq-table-tech-repair .eq-actions-cell button {
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  flex: 0 0 auto;
+}
+
+/* Informational text such as "No action required" */
+.eq-table-tech-repair .eq-no-action {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
 
 /* Meaningful, intentional "no action" text instead of a bare dash —
    styled distinctly from action buttons so it reads as informational,

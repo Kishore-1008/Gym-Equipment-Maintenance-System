@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +20,11 @@ import com.gymams.model.MaintenanceStatus;
 import com.gymams.model.RepairStatus;
 import com.gymams.repository.EquipmentRepository;
 import com.gymams.repository.MaintenanceScheduleRepository;
+import com.gymams.repository.RepairHistoryRepository;
 import com.gymams.repository.RepairRequestRepository;
 import com.gymams.repository.UsageRecordRepository;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class EquipmentService {
@@ -46,17 +48,20 @@ public class EquipmentService {
     private final UsageRecordRepository usageRecordRepository;
     private final RepairRequestRepository repairRequestRepository;
     private final MaintenanceScheduleRepository maintenanceScheduleRepository;
+    private final RepairHistoryRepository repairHistoryRepository;
 
     public EquipmentService(
             EquipmentRepository equipmentRepository,
             UsageRecordRepository usageRecordRepository,
             RepairRequestRepository repairRequestRepository,
-            MaintenanceScheduleRepository maintenanceScheduleRepository) {
+            MaintenanceScheduleRepository maintenanceScheduleRepository,
+            RepairHistoryRepository repairHistoryRepository) {
 
         this.equipmentRepository = equipmentRepository;
         this.usageRecordRepository = usageRecordRepository;
         this.repairRequestRepository = repairRequestRepository;
         this.maintenanceScheduleRepository = maintenanceScheduleRepository;
+        this.repairHistoryRepository = repairHistoryRepository;
     }
 
     public List<EquipmentResponse> findAll() {
@@ -117,11 +122,16 @@ public class EquipmentService {
                         "Equipment not found."
                 ));
 
-        // Delete every dependent record first — usage history, repair requests
-        // (Module 4), and maintenance schedules (Module 5) all hold a
-        // non-nullable FK to this equipment, so database integrity would break
-        // if we deleted the equipment first.
+        // Delete every dependent record first — usage history, repair
+        // history (Module 6), repair requests (Module 4), and maintenance
+        // schedules (Module 5) all hold a non-nullable FK to this
+        // equipment, so database integrity would break if we deleted the
+        // equipment first. Repair history must be removed before repair
+        // requests specifically, since repair_history.repair_request_id
+        // is itself a non-nullable FK into repair_request — deleting the
+        // requests first would leave history rows pointing at nothing.
         usageRecordRepository.deleteAllByEquipment_Id(equipment.getId());
+        repairHistoryRepository.deleteAllByEquipment_Id(equipment.getId());
         repairRequestRepository.deleteAllByEquipment_Id(equipment.getId());
         maintenanceScheduleRepository.deleteAllByEquipment_Id(equipment.getId());
 

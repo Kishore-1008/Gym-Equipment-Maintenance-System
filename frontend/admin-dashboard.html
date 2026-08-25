@@ -314,6 +314,42 @@
     </section>
   </main>
 
+  <!-- ============================================================
+       Repair History (Module 6) — Admin view: read-only record of
+       every completed repair. Records are created automatically the
+       moment a Technician marks a repair Completed (Module 4) — there
+       is no manual create/edit here, by design.
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="eq-section-title">Repair History</p>
+        <p class="eq-subtitle">A permanent, read-only record of every completed repair — most recent first.</p>
+      </div>
+    </div>
+
+    <section class="eq-panel">
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-repair-history">
+          <thead>
+            <tr>
+              <th>History ID</th>
+              <th>Request ID</th>
+              <th>Equipment</th>
+              <th>Technician</th>
+              <th>Completed</th>
+              <th>Cost</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="repairHistoryBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="repairHistoryEmpty" hidden>No completed repairs yet.</p>
+      </div>
+    </section>
+  </main>
+
   <div class="eq-toast" id="eqToast" role="status" aria-live="polite"></div>
   <div class="eq-toast" id="usageToast" role="status" aria-live="polite"></div>
   <div class="eq-toast" id="opsToast" role="status" aria-live="polite"></div>
@@ -371,6 +407,20 @@
       <div id="repairDetailsBody"></div>
       <div class="eq-modal-actions">
         <button type="button" class="btn-tag-outline btn-tag-compact" id="repairDetailsCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Repair History View Details modal (read-only, Module 6) ---------- -->
+  <div class="eq-modal" id="repairHistoryDetailsModal" hidden role="dialog" aria-modal="true" aria-labelledby="repairHistoryDetailsTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="repairHistoryDetailsTitle">Repair History Details</h3>
+        <button type="button" class="eq-modal-close" id="repairHistoryDetailsCloseIconBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="repairHistoryDetailsBody"></div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="repairHistoryDetailsCloseBtn">Close</button>
       </div>
     </div>
   </div>
@@ -643,6 +693,8 @@
   <script src="repair-dashboard.js"></script>
   <script src="maintenance-data.js"></script>
   <script src="maintenance-dashboard.js"></script>
+  <script src="repair-history-data.js"></script>
+  <script src="repair-history-dashboard.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession(ROLES.ADMIN);
@@ -651,6 +703,7 @@
         initUsageDashboard(session);
         initRepairDashboard(session);
         initMaintenanceDashboard(session);
+        initRepairHistoryDashboard(session);
       }
     });
   </script>

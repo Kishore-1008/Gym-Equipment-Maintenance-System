@@ -1,19 +1,27 @@
 package com.gymams.controller;
 
-import com.gymams.dto.CompletionDetailsRequest;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.gymams.dto.RepairCompletionDetailsRequest;
 import com.gymams.dto.RepairRequestCreateRequest;
 import com.gymams.dto.RepairRequestRejectRequest;
 import com.gymams.dto.RepairRequestResponse;
 import com.gymams.dto.TechnicianAssignRequest;
 import com.gymams.service.RepairRequestService;
 import com.gymams.service.UserService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 /**
  * Module 4 — Repair Request Management.
@@ -84,8 +92,8 @@ public class RepairRequestController {
 
     @PutMapping("/{id}/complete")
     public RepairRequestResponse complete(@PathVariable Long id, Authentication authentication,
-                                           @Valid @RequestBody CompletionDetailsRequest request) {
-        return repairRequestService.complete(id, authentication.getName(), request.getCompletionDetails());
+                                           @Valid @RequestBody RepairCompletionDetailsRequest request) {
+        return repairRequestService.complete(id, authentication.getName(), request);
     }
 
     /**

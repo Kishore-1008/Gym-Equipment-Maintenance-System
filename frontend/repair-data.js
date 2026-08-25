@@ -86,11 +86,16 @@ async function startRepairRequest(id) {
   return apiRequest(`/repair-requests/${id}/start`, { method: "PUT" });
 }
 
-/** PUT /api/repair-requests/{id}/complete — TECHNICIAN only. IN_PROGRESS -> COMPLETED. */
-async function completeRepairRequest(id, completionDetails) {
+/**
+ * PUT /api/repair-requests/{id}/complete — TECHNICIAN only. IN_PROGRESS -> COMPLETED.
+ * Module 6: also creates a permanent Repair History record server-side in
+ * the same transaction, so this now takes the full completion form rather
+ * than a single completionDetails string.
+ */
+async function completeRepairRequest(id, { repairDetails, partsUsed, repairCost, completionNotes }) {
   return apiRequest(`/repair-requests/${id}/complete`, {
     method: "PUT",
-    body: JSON.stringify({ completionDetails }),
+    body: JSON.stringify({ repairDetails, partsUsed, repairCost, completionNotes }),
   });
 }
 

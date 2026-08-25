@@ -1,5 +1,15 @@
 package com.gymams.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gymams.dto.RepairCompletionDetailsRequest;
 import com.gymams.dto.RepairRequestCreateRequest;
 import com.gymams.dto.RepairRequestResponse;
 import com.gymams.exception.ApiException;
@@ -9,14 +19,6 @@ import com.gymams.model.RepairStatus;
 import com.gymams.model.User;
 import com.gymams.repository.EquipmentRepository;
 import com.gymams.repository.RepairRequestRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Module 4 — Repair Request Management.
@@ -36,15 +38,18 @@ public class RepairRequestService {
     private final UserService userService;
 
     private final EquipmentService equipmentService;
+    private final RepairHistoryService repairHistoryService;
 
     public RepairRequestService(RepairRequestRepository repairRequestRepository,
                                  EquipmentRepository equipmentRepository,
                                  UserService userService,
-                                 EquipmentService equipmentService) {
+                                 EquipmentService equipmentService,
+                                 RepairHistoryService repairHistoryService) {
         this.repairRequestRepository = repairRequestRepository;
         this.equipmentRepository = equipmentRepository;
         this.userService = userService;
         this.equipmentService = equipmentService;
+        this.repairHistoryService = repairHistoryService;
     }
 
     /* ---------- Gym Manager ---------- */
@@ -164,20 +169,40 @@ public class RepairRequestService {
     }
 
     @Transactional
-    public RepairRequestResponse complete(Long id, String username, String completionDetails) {
+    public RepairRequestResponse complete(Long id, String username, RepairCompletionDetailsRequest request) {
         RepairRequest repairRequest = getOrThrow(id);
         requireAssignedTo(repairRequest, username);
         if (repairRequest.getStatus() != RepairStatus.IN_PROGRESS) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Only in-progress repairs can be completed.");
         }
-        String details = completionDetails == null ? "" : completionDetails.trim();
-        if (details.isEmpty()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Enter completion details.");
+
+        String repairDetails = request.getRepairDetails() == null ? "" : request.getRepairDetails().trim();
+        if (repairDetails.isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Enter repair details / work performed.");
         }
+        String partsUsed = request.getPartsUsed() == null ? "" : request.getPartsUsed().trim();
+        if (partsUsed.isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Enter parts used, or \"No parts used\" if none.");
+        }
+        if (request.getRepairCost() == null || request.getRepairCost().signum() < 0) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Enter a repair cost of 0 or more.");
+        }
+        String completionNotes = request.getCompletionNotes() == null ? null : request.getCompletionNotes().trim();
+
+        // The Repair Request's own completionDetails field keeps exactly
+        // its existing meaning and stays visible on the request itself
+        // (Module 4 behavior, unchanged) — it's set from the same "repair
+        // details / work performed" text the technician just entered.
         repairRequest.setStatus(RepairStatus.COMPLETED);
         repairRequest.setCompletedAt(LocalDateTime.now());
-        repairRequest.setCompletionDetails(details);
+        repairRequest.setCompletionDetails(repairDetails);
         RepairRequestResponse response = toResponse(repairRequestRepository.save(repairRequest));
+
+        // Module 6 — permanent, richer history record. Runs in the same
+        // transaction as the status change above: if this fails, the
+        // whole completion rolls back rather than leaving the request
+        // COMPLETED with no matching history.
+        repairHistoryService.recordCompletion(repairRequest, repairDetails, partsUsed, request.getRepairCost(), completionNotes);
 
         // Re-derive equipment status from scratch rather than blindly
         // setting OPERATIONAL — another active repair or maintenance

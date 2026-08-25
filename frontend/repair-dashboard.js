@@ -83,7 +83,7 @@ function opsShowModal(modal) {
 const OPS_MODAL_IDS = [
   "repairRejectModal", "repairAssignModal", "repairDetailsModal",
   "maintenanceScheduleModal", "maintRescheduleModal", "maintCancelModal",
-  "repairCompleteModal", "maintCompleteModal",
+  "repairCompleteModal", "maintCompleteModal", "repairHistoryDetailsModal",
 ];
 
 function opsHideModal(modal) {
@@ -575,6 +575,9 @@ function openRepairCompleteModal(id) {
   const modal = document.getElementById("repairCompleteModal");
   if (!modal) return;
   document.getElementById("repairCompletionDetails").value = "";
+  document.getElementById("repairPartsUsed").value = "";
+  document.getElementById("repairCost").value = "";
+  document.getElementById("repairCompletionNotes").value = "";
   repairClearAlert(document.getElementById("repairCompleteAlert"));
   opsShowModal(modal);
 }
@@ -587,6 +590,9 @@ function wireRepairCompleteModal() {
   const closeBtn = document.getElementById("repairCompleteCloseBtn");
   const saveBtn = document.getElementById("repairCompleteSaveBtn");
   const detailsInput = document.getElementById("repairCompletionDetails");
+  const partsInput = document.getElementById("repairPartsUsed");
+  const costInput = document.getElementById("repairCost");
+  const notesInput = document.getElementById("repairCompletionNotes");
   const alertBox = document.getElementById("repairCompleteAlert");
 
   const close = () => opsHideModal(modal);
@@ -595,15 +601,34 @@ function wireRepairCompleteModal() {
 
   saveBtn.addEventListener("click", async () => {
     repairClearAlert(alertBox);
-    const details = detailsInput.value.trim();
-    if (!details) {
-      repairShowAlert(alertBox, "Enter completion details.");
+
+    const repairDetails = detailsInput.value.trim();
+    const partsUsed = partsInput.value.trim();
+    const costRaw = costInput.value.trim();
+    const completionNotes = notesInput.value.trim();
+
+    if (!repairDetails) {
+      repairShowAlert(alertBox, "Enter repair details / work performed.");
       return;
     }
+    if (!partsUsed) {
+      repairShowAlert(alertBox, 'Enter parts used, or "No parts used" if none.');
+      return;
+    }
+    if (costRaw === "" || Number.isNaN(Number(costRaw)) || Number(costRaw) < 0) {
+      repairShowAlert(alertBox, "Enter a repair cost of 0 or more.");
+      return;
+    }
+
     saveBtn.disabled = true;
     saveBtn.textContent = "Saving…";
     try {
-      await completeRepairRequest(repairCompleteTargetId, details);
+      await completeRepairRequest(repairCompleteTargetId, {
+        repairDetails,
+        partsUsed,
+        repairCost: Number(costRaw),
+        completionNotes: completionNotes || null,
+      });
       showOpsToast(`Repair #${repairCompleteTargetId} marked completed.`);
       close();
       await loadAssignedRepairRequests();

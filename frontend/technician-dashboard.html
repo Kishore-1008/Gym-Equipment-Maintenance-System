@@ -93,8 +93,20 @@
       </div>
       <div id="repairCompleteAlert"></div>
       <div class="mb-3">
-        <label class="form-label" for="repairCompletionDetails">Completion Details</label>
+        <label class="form-label" for="repairCompletionDetails">Repair Details / Work Performed</label>
         <textarea class="form-control" id="repairCompletionDetails" rows="3" placeholder="e.g. Replaced the damaged belt and tested the treadmill successfully." required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="repairPartsUsed">Parts Used</label>
+        <input type="text" class="form-control" id="repairPartsUsed" placeholder='e.g. Treadmill belt, or "No parts used"' required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="repairCost">Repair Cost</label>
+        <input type="number" class="form-control" id="repairCost" min="0" step="0.01" placeholder="0.00" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="repairCompletionNotes">Completion Notes <span class="eq-muted">(optional)</span></label>
+        <textarea class="form-control" id="repairCompletionNotes" rows="2" placeholder="Any additional notes for the record."></textarea>
       </div>
       <div class="eq-modal-actions">
         <button type="button" class="btn-tag-outline btn-tag-compact" id="repairCompleteCancelBtn">Cancel</button>

@@ -1,6 +1,7 @@
 package com.gymams.config;
 
-import com.gymams.security.JwtAuthFilter;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import com.gymams.security.JwtAuthFilter;
 
 /**
  * Stateless JWT security. /api/auth/** is open (registration/login have
@@ -91,6 +92,11 @@ public class SecurityConfig {
 
                 // ---------- Technician directory (Module 4/5 assignment dropdown) ----------
                 .requestMatchers(HttpMethod.GET, "/api/users/technicians").hasRole("ADMIN")
+
+                // ---------- Module 6 — Repair History ----------
+                // Admin-only, strictly read-only — records are only ever
+                // created internally when a Technician completes a repair.
+                .requestMatchers(HttpMethod.GET, "/api/repair-history").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
             )
