@@ -84,6 +84,7 @@ const OPS_MODAL_IDS = [
   "repairRejectModal", "repairAssignModal", "repairDetailsModal",
   "maintenanceScheduleModal", "maintRescheduleModal", "maintCancelModal",
   "repairCompleteModal", "maintCompleteModal", "repairHistoryDetailsModal",
+  "warrantyFormModal", "warrantyDetailsModal",
 ];
 
 function opsHideModal(modal) {
@@ -536,7 +537,7 @@ function renderAssignedRepairRequests() {
         <td>${repairEscapeHtml(r.problemDescription)}</td>
         <td>${repairStatusBadge(r.status)}</td>
         <td>${repairEscapeHtml(r.assignedDate || "—")}</td>
-        <td class="eq-actions-cell">${actions.length ? actions.join(" ") : `<span class="eq-no-action">${repairEscapeHtml(r.status === REPAIR_STATUS.COMPLETED ? "No action required — completed" : "No action required")}</span>`}</td>
+        <td class="eq-actions-cell">${actions.length ? actions.join(" ") : `<span class="eq-no-action">${repairEscapeHtml("No action required")}</span>`}</td>
       </tr>`;
     }).join("");
 

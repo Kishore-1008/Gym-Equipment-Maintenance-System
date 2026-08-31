@@ -10,7 +10,7 @@
   />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="page-bg-admin">
 
   <nav class="dash-nav">
     <div class="brand d-flex align-items-center gap-2">
@@ -27,16 +27,18 @@
   <main class="eq-page">
 
     <!-- ---------- Page header ---------- -->
-    <div class="eq-header">
-      <div class="eq-header-text">
-        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
-        <p class="eq-subtitle">Here's the current condition of your gym equipment.</p>
-      </div>
+    <div class="dash-hero dash-hero-admin">
+      <div class="eq-header">
+        <div class="eq-header-text">
+          <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+          <p class="eq-subtitle">Here's the current condition of your gym equipment.</p>
+        </div>
 
-      <div class="eq-quick-actions">
-        <button class="btn-tag-outline" data-eq-action="add">+ Add Equipment</button>
-        <button class="btn-tag-outline" data-eq-action="view">View Equipment</button>
-        <button class="btn-tag-outline" data-eq-action="schedule">Schedule Maintenance</button>
+        <div class="eq-quick-actions">
+          <button class="btn-tag-outline" data-eq-action="add">+ Add Equipment</button>
+          <button class="btn-tag-outline" data-eq-action="view">View Equipment</button>
+          <button class="btn-tag-outline" data-eq-action="schedule">Schedule Maintenance</button>
+        </div>
       </div>
     </div>
 
@@ -350,6 +352,58 @@
     </section>
   </main>
 
+  <!-- ============================================================
+       Warranty Management (Module 7) — Admin view: add/view/edit
+       equipment warranties and track upcoming expirations. Reuses
+       the existing Equipment entity via a dropdown — no equipment
+       details are duplicated here.
+       ============================================================ -->
+  <main class="eq-page">
+
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="eq-section-title">Warranty Management</p>
+        <p class="eq-subtitle">Manage equipment warranties and track upcoming expirations.</p>
+      </div>
+      <button type="button" class="btn-tag btn-tag-compact" id="btnAddWarranty">+ Add Warranty</button>
+    </div>
+
+    <!-- ---------- Summary cards ---------- -->
+    <section class="eq-summary-grid" id="warrantySummaryCards" aria-label="Warranty summary"></section>
+
+    <!-- ---------- Toolbar ---------- -->
+    <div class="eq-toolbar eq-toolbar-tight">
+      <input type="text" class="eq-search-input" id="warrantySearchInput" placeholder="Search warranties…" aria-label="Search warranties" />
+      <select id="warrantyStatusFilter" class="eq-filter-select" aria-label="Filter by status">
+        <option value="">All</option>
+        <option value="ACTIVE">Active</option>
+        <option value="EXPIRING_SOON">Expiring Soon</option>
+        <option value="EXPIRED">Expired</option>
+      </select>
+    </div>
+
+    <section class="eq-panel">
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed eq-table-warranty">
+          <thead>
+            <tr>
+              <th>Warranty ID</th>
+              <th>Equipment</th>
+              <th>Provider</th>
+              <th>Warranty Type</th>
+              <th>Start Date</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="warrantyBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="warrantyEmpty" hidden>No warranties recorded yet.</p>
+      </div>
+    </section>
+  </main>
+
   <div class="eq-toast" id="eqToast" role="status" aria-live="polite"></div>
   <div class="eq-toast" id="usageToast" role="status" aria-live="polite"></div>
   <div class="eq-toast" id="opsToast" role="status" aria-live="polite"></div>
@@ -421,6 +475,71 @@
       <div id="repairHistoryDetailsBody"></div>
       <div class="eq-modal-actions">
         <button type="button" class="btn-tag-outline btn-tag-compact" id="repairHistoryDetailsCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Add / Edit Warranty modal (shared form) ---------- -->
+  <div class="eq-modal" id="warrantyFormModal" hidden role="dialog" aria-modal="true" aria-labelledby="warrantyFormTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="warrantyFormTitle">Add Warranty</h3>
+        <button type="button" class="eq-modal-close" id="warrantyFormCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <form id="warrantyForm" novalidate>
+        <div id="warrantyFormAlert"></div>
+        <div class="mb-3">
+          <label class="form-label" for="warrantyEquipmentSelect">Equipment</label>
+          <select class="form-select" id="warrantyEquipmentSelect" required>
+            <option value="" selected disabled>Select equipment</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="warrantyProviderInput">Warranty Provider</label>
+          <input type="text" class="form-control" id="warrantyProviderInput" placeholder="e.g. Life Fitness" required />
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="warrantyTypeSelect">Warranty Type</label>
+            <select class="form-select" id="warrantyTypeSelect" required>
+              <option value="" selected disabled>Select type</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="warrantyStartDateInput">Start Date</label>
+            <input type="date" class="form-control" id="warrantyStartDateInput" required />
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="warrantyExpiryDateInput">Expiry Date</label>
+          <input type="date" class="form-control" id="warrantyExpiryDateInput" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="warrantyCoverageInput">Coverage Details</label>
+          <textarea class="form-control" id="warrantyCoverageInput" rows="3" placeholder="e.g. Motor, belt and console"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="warrantyContactInput">Contact Information</label>
+          <input type="text" class="form-control" id="warrantyContactInput" placeholder="e.g. support@lifefitness.com" />
+        </div>
+        <div class="eq-modal-actions">
+          <button type="button" class="btn-tag-outline btn-tag-compact" id="warrantyFormCancelBtn">Cancel</button>
+          <button type="submit" class="btn-tag eq-modal-save btn-tag-compact" id="warrantyFormSaveBtn">Save Warranty</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- View Warranty Details modal (read-only) ---------- -->
+  <div class="eq-modal" id="warrantyDetailsModal" hidden role="dialog" aria-modal="true" aria-labelledby="warrantyDetailsTitle">
+    <div class="eq-modal-dialog">
+      <div class="eq-modal-header">
+        <h3 id="warrantyDetailsTitle">Warranty Details</h3>
+        <button type="button" class="eq-modal-close" id="warrantyDetailsCloseIconBtn" aria-label="Close">&times;</button>
+      </div>
+      <div id="warrantyDetailsBody"></div>
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-tag-outline btn-tag-compact" id="warrantyDetailsCloseBtn">Close</button>
       </div>
     </div>
   </div>
@@ -695,6 +814,8 @@
   <script src="maintenance-dashboard.js"></script>
   <script src="repair-history-data.js"></script>
   <script src="repair-history-dashboard.js"></script>
+  <script src="warranty-data.js"></script>
+  <script src="warranty-dashboard.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession(ROLES.ADMIN);
@@ -704,6 +825,7 @@
         initRepairDashboard(session);
         initMaintenanceDashboard(session);
         initRepairHistoryDashboard(session);
+        initWarrantyDashboard(session);
       }
     });
   </script>

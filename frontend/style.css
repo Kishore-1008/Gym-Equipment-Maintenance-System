@@ -1276,6 +1276,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .eq-table-repair-history th:nth-child(6), .eq-table-repair-history td:nth-child(6) { width: 10%; }
 .eq-table-repair-history th:nth-child(7), .eq-table-repair-history td:nth-child(7) { width: 16%; }
 
+/* Admin — Warranty Management (8 cols: ID, Equipment, Provider, Type,
+   Start Date, Expiry Date, Status, Actions) */
+.eq-table-warranty th:nth-child(1), .eq-table-warranty td:nth-child(1) { width: 9%; }
+.eq-table-warranty th:nth-child(2), .eq-table-warranty td:nth-child(2) { width: 16%; }
+.eq-table-warranty th:nth-child(3), .eq-table-warranty td:nth-child(3) { width: 14%; }
+.eq-table-warranty th:nth-child(4), .eq-table-warranty td:nth-child(4) { width: 11%; }
+.eq-table-warranty th:nth-child(5), .eq-table-warranty td:nth-child(5) { width: 11%; }
+.eq-table-warranty th:nth-child(6), .eq-table-warranty td:nth-child(6) { width: 11%; }
+.eq-table-warranty th:nth-child(7), .eq-table-warranty td:nth-child(7) { width: 12%; }
+.eq-table-warranty th:nth-child(8), .eq-table-warranty td:nth-child(8) { width: 16%; }
+
 /* Technician — Assigned Repairs (5 cols) */
 .eq-table-tech-repair th:nth-child(1),
 .eq-table-tech-repair td:nth-child(1) {
