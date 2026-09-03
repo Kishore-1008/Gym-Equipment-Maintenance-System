@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports · Gym Equipment Maintenance System</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="dash-nav">
+    <div class="brand d-flex align-items-center gap-2">
+      <div class="brand-mark">G</div>
+      <span class="brand-name">Gym Equipment Maintenance System</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <a href="admin-dashboard.html" class="btn-change-password">Back to Dashboard</a>
+      <span class="eq-user-chip" id="eqUserChip">—</span>
+      <button class="btn-change-password" id="changePasswordBtn">Change Password</button>
+      <button class="btn-logout" id="logoutBtn">Log Out</button>
+    </div>
+  </nav>
+
+  <main class="eq-page">
+
+    <!-- ---------- Page header ---------- -->
+    <div class="eq-header">
+      <div class="eq-header-text">
+        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+        <p class="eq-subtitle">Reports — summarized information from Equipment, Maintenance, Repairs, Usage, and Warranty.</p>
+      </div>
+    </div>
+
+    <!-- ---------- 1. Equipment Report ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Equipment Report</h2>
+      <p class="eq-panel-subtitle">Current equipment counts by status and category.</p>
+      <div class="eq-summary-grid" id="reportEquipment"></div>
+    </section>
+
+    <!-- ---------- 2. Maintenance Report ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Maintenance Report</h2>
+      <p class="eq-panel-subtitle">Upcoming, completed, and overdue maintenance.</p>
+      <div class="eq-summary-grid" id="reportMaintenance"></div>
+    </section>
+
+    <!-- ---------- 3. Repair Report ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Repair Report</h2>
+      <p class="eq-panel-subtitle">Repair volume and cost, from Repair History.</p>
+      <div class="eq-summary-grid" id="reportRepairs"></div>
+    </section>
+
+    <!-- ---------- 4. Usage Report ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Usage Report</h2>
+      <p class="eq-panel-subtitle">Today's usage snapshot, from Usage Monitoring.</p>
+      <div class="eq-summary-grid" id="reportUsage"></div>
+    </section>
+
+    <!-- ---------- 5. Warranty Report ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Warranty Report</h2>
+      <p class="eq-panel-subtitle">Warranty coverage status across all equipment.</p>
+      <div class="eq-summary-grid" id="reportWarranty"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+  <script src="equipment-data.js"></script>
+  <script src="repair-data.js"></script>
+  <script src="maintenance-data.js"></script>
+  <script src="repair-history-data.js"></script>
+  <script src="warranty-data.js"></script>
+  <script src="usage-data.js"></script>
+  <script src="reports.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const session = requireSession(ROLES.ADMIN);
+      if (session) initReports(session);
+    });
+  </script>
+</body>
+</html>

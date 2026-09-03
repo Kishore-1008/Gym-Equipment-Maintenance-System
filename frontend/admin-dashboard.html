@@ -18,6 +18,7 @@
       <span class="brand-name">Gym Equipment Maintenance System</span>
     </div>
     <div class="d-flex align-items-center gap-3">
+      <a href="reports.html" class="btn-change-password">Reports</a>
       <span class="eq-user-chip" id="eqUserChip">—</span>
       <button class="btn-change-password" id="changePasswordBtn">Change Password</button>
       <button class="btn-logout" id="logoutBtn">Log Out</button>
@@ -42,7 +43,110 @@
       </div>
     </div>
 
-    <!-- ---------- 1. Summary cards ---------- -->
+    <!-- ============================================================
+         Dashboard & Reports (Module 8) — compact "at a glance" summary
+         pulling from Equipment (1), Repair Requests (4), Maintenance
+         (5), Repair History (6), Warranty (7), and Usage Monitoring —
+         all via existing data-layer fetch calls (see
+         dashboard-overview-admin.js). This sits ABOVE the existing
+         detailed management sections further down the page, which are
+         completely unchanged.
+         ============================================================ -->
+
+    <!-- ---------- Equipment Statistics ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Equipment Statistics</h2>
+      <p class="eq-panel-subtitle">A snapshot of equipment status and category mix.</p>
+      <div class="eq-summary-grid" id="dashEquipmentStats"></div>
+    </section>
+
+    <div class="eq-grid-2">
+      <!-- ---------- Pending Requests ---------- -->
+      <section class="eq-panel">
+        <div class="eq-panel-header-row">
+          <div>
+            <h2 class="eq-panel-title">Pending Requests <span class="eq-mono eq-muted" id="dashPendingCount"></span></h2>
+            <p class="eq-panel-subtitle">Repair requests awaiting your review.</p>
+          </div>
+        </div>
+        <div class="eq-table-wrap">
+          <table class="eq-table eq-table-fixed">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Equipment</th>
+                <th>Raised By</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="dashPendingBody"></tbody>
+          </table>
+          <p class="eq-empty-state" id="dashPendingEmpty" hidden>No pending requests.</p>
+        </div>
+      </section>
+
+      <!-- ---------- Maintenance Schedule ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Maintenance Schedule</h2>
+        <p class="eq-panel-subtitle">Upcoming and overdue maintenance.</p>
+        <div class="eq-table-wrap">
+          <table class="eq-table eq-table-fixed">
+            <thead>
+              <tr>
+                <th>Equipment</th>
+                <th>Type</th>
+                <th>Scheduled Date</th>
+                <th>Technician</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashMaintenanceBody"></tbody>
+          </table>
+          <p class="eq-empty-state" id="dashMaintenanceEmpty" hidden>No upcoming maintenance.</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="eq-grid-2">
+      <!-- ---------- Repair Statistics ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Repair Statistics</h2>
+        <p class="eq-panel-subtitle">From completed repair history.</p>
+        <div class="eq-summary-grid" id="dashRepairStats"></div>
+      </section>
+
+      <!-- ---------- Usage Statistics ---------- -->
+      <section class="eq-panel">
+        <h2 class="eq-panel-title">Usage Statistics</h2>
+        <p class="eq-panel-subtitle">Today's usage snapshot.</p>
+        <div class="eq-summary-grid" id="dashUsageStats"></div>
+      </section>
+    </div>
+
+    <!-- ---------- Warranty Alerts ---------- -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Warranty Alerts</h2>
+      <p class="eq-panel-subtitle">Coverage status across all equipment.</p>
+      <div class="eq-summary-grid" id="dashWarrantyCounts"></div>
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Provider</th>
+              <th>Expiry Date</th>
+              <th>Days Remaining</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="dashWarrantyBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="dashWarrantyEmpty" hidden>No warranties expiring soon.</p>
+      </div>
+    </section>
+
+    <p class="eq-section-title" style="margin-top: 2.5rem;">Equipment Management</p>
     <section class="eq-summary-grid" id="eqSummaryCards" aria-label="Equipment summary"></section>
 
     <div class="eq-grid-2">
@@ -816,6 +920,7 @@
   <script src="repair-history-dashboard.js"></script>
   <script src="warranty-data.js"></script>
   <script src="warranty-dashboard.js"></script>
+  <script src="dashboard-overview-admin.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession(ROLES.ADMIN);
@@ -826,6 +931,7 @@
         initMaintenanceDashboard(session);
         initRepairHistoryDashboard(session);
         initWarrantyDashboard(session);
+        initDashboardOverviewAdmin(session);
       }
     });
   </script>

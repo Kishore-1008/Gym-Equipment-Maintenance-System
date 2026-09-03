@@ -10,7 +10,7 @@
   />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="page-bg-technician">
 
   <nav class="dash-nav">
     <div class="brand d-flex align-items-center gap-2">
@@ -25,15 +25,40 @@
 
   <main class="eq-page">
 
-    <div class="eq-header">
-      <div class="eq-header-text">
-        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
-        <p class="eq-subtitle">Your assigned repair and maintenance work, in one place.</p>
+    <div class="dash-hero dash-hero-technician">
+      <div class="eq-header">
+        <div class="eq-header-text">
+          <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+          <p class="eq-subtitle">Your assigned repair and maintenance work, in one place.</p>
+        </div>
       </div>
     </div>
 
     <!-- ---------- Summary ---------- -->
     <section class="eq-summary-grid" id="techSummaryCards" aria-label="Task summary"></section>
+
+    <!-- ---------- Completed Jobs (Module 8) ----------
+         Uses the existing GET /api/repair-requests/assigned and
+         GET /api/maintenance/assigned endpoints, already scoped
+         server-side to the logged-in technician. -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Completed Jobs</h2>
+      <p class="eq-panel-subtitle">Your finished repair and maintenance work.</p>
+      <div class="eq-summary-grid" id="dashTechCompletedCounts"></div>
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Job Type</th>
+              <th>Completed</th>
+            </tr>
+          </thead>
+          <tbody id="dashTechCompletedBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="dashTechCompletedEmpty" hidden>No completed jobs yet.</p>
+      </div>
+    </section>
 
     <!-- ---------- Assigned Repairs (Module 4) ---------- -->
     <section class="eq-panel">
@@ -250,12 +275,14 @@
   <script src="maintenance-data.js"></script>
   <script src="maintenance-dashboard.js"></script>
   <script src="technician-dashboard.js"></script>
+  <script src="dashboard-overview-technician.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession("TECHNICIAN");
       if (session) {
         initRepairDashboard(session);
         initMaintenanceDashboard(session);
+        initDashboardOverviewTechnician(session);
       }
     });
   </script>

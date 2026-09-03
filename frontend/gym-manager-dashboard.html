@@ -10,7 +10,7 @@
   />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="page-bg-manager">
 
   <nav class="dash-nav">
     <div class="brand d-flex align-items-center gap-2">
@@ -33,12 +33,40 @@
        ============================================================ -->
   <main class="eq-page">
 
-    <div class="eq-header">
-      <div class="eq-header-text">
-        <p class="dash-greeting" id="dashGreeting">Welcome!</p>
-        <p class="eq-subtitle">Repair Requests — report a problem with a piece of equipment and track it through to completion.</p>
+    <div class="dash-hero dash-hero-gym-manager">
+      <div class="eq-header">
+        <div class="eq-header-text">
+          <p class="dash-greeting" id="dashGreeting">Welcome!</p>
+          <p class="eq-subtitle">Repair Requests — report a problem with a piece of equipment and track it through to completion.</p>
+        </div>
       </div>
     </div>
+
+    <!-- ============================================================
+         Dashboard Overview (Module 8) — Equipment Status, read-only
+         for the Gym Manager. Uses the existing GET /api/equipment
+         endpoint (already callable by any authenticated role) — no
+         new backend code. See dashboard-overview-manager.js.
+         ============================================================ -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">Equipment Status</h2>
+      <p class="eq-panel-subtitle">Equipment needing attention right now.</p>
+      <div class="eq-summary-grid" id="dashMgrEquipmentCards"></div>
+      <div class="eq-table-wrap">
+        <table class="eq-table eq-table-fixed">
+          <thead>
+            <tr>
+              <th>Equipment ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="dashMgrEquipmentBody"></tbody>
+        </table>
+        <p class="eq-empty-state" id="dashMgrEquipmentEmpty" hidden>All equipment is operational.</p>
+      </div>
+    </section>
 
     <!-- ---------- Report a Problem ---------- -->
     <section class="eq-panel eq-panel-compact">
@@ -58,6 +86,16 @@
         </div>
         <button type="submit" class="btn-tag btn-tag-compact" id="repairSubmitBtn">Submit Repair Request</button>
       </form>
+    </section>
+
+    <!-- ---------- Their Requests summary (Module 8) ----------
+         Uses the existing GET /api/repair-requests/my endpoint, already
+         scoped server-side to the logged-in Gym Manager — this widget
+         never sees another Manager's requests. -->
+    <section class="eq-panel">
+      <h2 class="eq-panel-title">My Requests Summary</h2>
+      <p class="eq-panel-subtitle">Status breakdown of your submitted repair requests.</p>
+      <div class="eq-summary-grid" id="dashMgrRequestCounts"></div>
     </section>
 
     <!-- ---------- My Repair Requests ---------- -->
@@ -309,12 +347,14 @@
   <script src="usage-dashboard.js"></script>
   <script src="repair-data.js"></script>
   <script src="repair-dashboard.js"></script>
+  <script src="dashboard-overview-manager.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const session = requireSession("GYM_MANAGER");
       if (session) {
         initUsageDashboard(session);
         initRepairDashboard(session);
+        initDashboardOverviewManager(session);
       }
     });
   </script>
