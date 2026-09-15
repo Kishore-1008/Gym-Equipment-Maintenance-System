@@ -27,6 +27,20 @@ function reportEmpty(message) {
   return `<p class="eq-empty-state">${reportsEscapeHtml(message)}</p>`;
 }
 
+/** Name + equipment ID, e.g. "Treadmill EQ001" — same pattern as equipmentLabel() in usage-dashboard.js, redeclared here since that file isn't loaded on reports.html. */
+function reportEquipmentLabel(name, id) {
+  return `${reportsEscapeHtml(name)} <span class="eq-mono eq-muted">${reportsEscapeHtml(id)}</span>`;
+}
+
+/** A text-based card (equipment name, not a number) — smaller value size so a name + ID fits cleanly instead of rendering at the same oversized weight as a plain count. */
+function reportTextCard(label, valueHtml, accent) {
+  return `
+    <div class="eq-card eq-card-${accent}">
+      <span class="eq-card-value eq-card-value-sm">${valueHtml}</span>
+      <span class="eq-card-label">${reportsEscapeHtml(label)}</span>
+    </div>`;
+}
+
 /* ---------- 1. Equipment Report ---------- */
 
 async function loadEquipmentReport() {
@@ -43,8 +57,6 @@ async function loadEquipmentReport() {
       reportCard("Operational", equipment.filter((e) => e.status === "OPERATIONAL").length, "ok"),
       reportCard("Under Repair", equipment.filter((e) => e.status === "UNDER_REPAIR").length, "danger"),
       reportCard("Out of Service", equipment.filter((e) => e.status === "OUT_OF_SERVICE").length, "danger"),
-      reportCard("Cardio", equipment.filter((e) => e.category === "Cardio").length, "info"),
-      reportCard("Strength", equipment.filter((e) => e.category === "Strength").length, "info"),
     ].join("");
   } catch (err) {
     el.innerHTML = reportEmpty("Couldn't load the equipment report.");
@@ -89,13 +101,11 @@ async function loadRepairReport() {
       return;
     }
     const totalCost = history.reduce((sum, h) => sum + (Number(h.repairCost) || 0), 0);
-    const avgCost = history.length > 0 ? totalCost / history.length : 0;
 
     el.innerHTML = [
       reportCard("Total Repairs", allRequests.length, "info"),
       reportCard("Completed Repairs", history.length, "ok"),
       reportCard("Total Cost", totalCost.toFixed(2), "warn"),
-      reportCard("Average Cost", avgCost.toFixed(2), "warn"),
     ].join("");
   } catch (err) {
     el.innerHTML = reportEmpty("Couldn't load the repair report.");
@@ -121,8 +131,8 @@ async function loadUsageReport() {
 
     el.innerHTML = [
       reportCard("Equipment Logged Today", loggedToday, "info"),
-      reportCard("Most Used", mostUsed ? mostUsed.equipmentName : "—", "ok"),
-      reportCard("Least Used", leastUsed ? leastUsed.equipmentName : "—", "info"),
+      reportTextCard("Most Used", mostUsed ? reportEquipmentLabel(mostUsed.equipmentName, mostUsed.equipmentId) : "—", "ok"),
+      reportTextCard("Least Used", leastUsed ? reportEquipmentLabel(leastUsed.equipmentName, leastUsed.equipmentId) : "—", "info"),
       reportCard("High Usage", highUsage, "warn"),
     ].join("");
   } catch (err) {

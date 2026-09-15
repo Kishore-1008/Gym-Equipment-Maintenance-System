@@ -14,28 +14,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Core palette */
-  --graphite-900: #14181c;   /* darkest panel background */
-  --graphite-800: #1b2129;   /* dark panel surface */
-  --graphite-700: #262e37;   /* dark panel raised surface */
-  --steel-50:     #eef1f2;   /* light panel background */
-  --steel-100:    #ffffff;   /* card surface on light panel */
-  --steel-200:    #dde2e5;   /* borders on light panel */
-  --text-dark:    #1b2129;
-  --text-muted:   #64707a;
-  --text-inverse: #e9edef;
-  --text-inverse-muted: #8b98a3;
+  /* Core palette — dark premium theme. steel-50/100/200 and
+     text-dark/text-muted keep their original NAMES (so every rule
+     built on them elsewhere in this file needs no further changes)
+     but now point at the app's own graphite tones — reusing the
+     existing page/panel/raised-surface ladder rather than
+     inventing a new palette. */
+  --graphite-900: #14181c;   /* darkest — page background */
+  --graphite-800: #1c232b;   /* primary panel surface */
+  --graphite-700: #262e37;   /* secondary/raised panel surface — headers, hovers */
+  --steel-50:     #14181c;   /* page background (was: light panel background) */
+  --steel-100:    #1c232b;   /* card/panel surface (was: white) */
+  --steel-200:    #333d47;   /* borders on dark panel (was: light border) */
+  --text-dark:    #eef0f1;   /* primary text — light-on-dark */
+  --text-muted:   #9ba3a8;   /* secondary text — light-muted */
+  --text-inverse: #e9edef;   /* text on the darkest surfaces (nav) — unchanged */
+  --text-inverse-muted: #8b98a3; /* unchanged */
 
-  /* Accents */
-  --safety-orange: #ff6a3d;  /* primary accent — hazard-tag orange */
+  /* Accents — safety-orange stays the established primary accent
+     (buttons, focus rings, brand mark) rather than a full rebrand;
+     ok-green/steel-blue already cover the "professional green/teal"
+     direction for status/secondary use, brightened just enough to
+     stay readable as text/badges on a dark panel. alert-red is the
+     warning/danger accent throughout. */
+  --safety-orange: #ff6a3d;
   --safety-orange-dark: #e5502a;
-  --steel-blue:    #3e6e8e;  /* secondary accent */
+  --steel-blue:    #6ea3c7;  /* brightened from #3e6e8e for contrast on dark panels */
   --ok-green:      #2fb380;
   --alert-red:     #e5484d;
 
   --radius-sm: 6px;
   --radius-md: 10px;
-  --shadow-card: 0 24px 48px -20px rgba(20, 24, 28, 0.35);
+  /* Dark-theme elevation: a plain dark drop-shadow barely reads
+     against an already-dark page, so this pairs a deeper shadow
+     with a subtle 1px light edge to define each card's boundary. */
+  --shadow-card: 0 24px 48px -20px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 * { box-sizing: border-box; }
@@ -48,7 +61,60 @@ body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text-dark);
-  background: var(--steel-50);
+  background-color: var(--steel-50);
+  min-height: 100vh;
+}
+
+/* ---------- Full-page dashboard/reports background images ----------
+   Applied via a body class already present in each page's <body> tag
+   (page-bg-admin / page-bg-manager / page-bg-technician / page-bg-reports).
+   Local files only — no external URLs — see frontend/images/.
+
+   Readability: cards, panels, and tables (.eq-panel, .eq-card, .eq-table,
+   form controls, etc.) already have their own solid dark background
+   color and are completely unaffected by this — only the page's own
+   gutters/margins around and between them reveal the image, softened by
+   a dark overlay so the photo reads as atmospheric texture rather than
+   a distracting, brightly-lit backdrop.
+
+   No CSS animation/keyframes here — a static image + a static overlay,
+   nothing that loops or repaints on a timer. */
+.page-bg-admin,
+.page-bg-manager,
+.page-bg-technician,
+.page-bg-reports {
+  background-color: var(--steel-50); /* fallback while the image loads, or if it's missing */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.page-bg-admin::before,
+.page-bg-manager::before,
+.page-bg-technician::before,
+.page-bg-reports::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(12, 15, 18, 0.72);
+}
+
+.page-bg-admin, .page-bg-reports { background-image: url("images/admin-dashboard-bg.jpg"); }
+.page-bg-manager { background-image: url("images/manager-dashboard-bg.jpg"); }
+.page-bg-technician { background-image: url("images/technician-dashboard-bg.jpg"); }
+
+@media (max-width: 768px) {
+  /* background-attachment: fixed is unreliable on many mobile
+     browsers (notably iOS Safari) — scroll normally there instead. */
+  .page-bg-admin,
+  .page-bg-manager,
+  .page-bg-technician,
+  .page-bg-reports {
+    background-attachment: scroll;
+  }
 }
 
 .eyebrow {
@@ -71,10 +137,11 @@ body {
 .auth-visual {
   flex: 1 1 420px;
   min-height: 340px;
-  background:
-    radial-gradient(circle at 15% 12%, rgba(255, 106, 61, 0.14), transparent 45%),
-    repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 26px),
-    var(--graphite-900);
+  background-color: var(--graphite-900); /* fallback while the image loads, or if it's missing */
+  background-image: url("images/login-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--text-inverse);
   display: flex;
   flex-direction: column;
@@ -82,6 +149,21 @@ body {
   padding: clamp(2rem, 5vw, 4rem);
   position: relative;
   overflow: hidden;
+}
+
+/* Dark/semi-transparent overlay so the brand mark, heading, and lede
+   text stay readable over the photo regardless of its brightness. */
+.auth-visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(160deg, rgba(14, 20, 24, 0.88) 0%, rgba(14, 20, 24, 0.8) 55%, rgba(14, 20, 24, 0.68) 100%);
+}
+
+.auth-visual > * {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-visual .brand {
@@ -279,6 +361,7 @@ body {
   padding: 0.62rem 0.8rem;
   font-size: 0.94rem;
   background: var(--steel-100);
+  color: var(--text-dark);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -341,13 +424,13 @@ body {
 }
 
 .alert-tag-success {
-  background: rgba(47, 179, 128, 0.12);
-  color: #1c8560;
+  background: rgba(47, 179, 128, 0.16);
+  color: #4ade95;
 }
 
 .alert-tag-danger {
-  background: rgba(229, 72, 77, 0.1);
-  color: #c23c40;
+  background: rgba(229, 72, 77, 0.16);
+  color: #ff8087;
 }
 
 .helper-text {
@@ -520,6 +603,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   flex-direction: column;
   gap: 0.3rem;
   box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .eq-card-value {
@@ -580,6 +664,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: var(--shadow-card);
   padding: 1.4rem 1.5rem 1.6rem;
   margin-bottom: 1.25rem;
+  border-top: 3px solid var(--steel-200);
+  transition: border-color 0.2s ease;
 }
 
 .eq-grid-2 .eq-panel { margin-bottom: 0; }
@@ -660,7 +746,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .eq-dot-danger { background: var(--alert-red); }
 
 /* ---------- Tables (Maintenance Attention / Equipment Overview) ---------- */
-.eq-table-wrap { overflow-x: auto; }
+.eq-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--steel-200);
+  border-radius: var(--radius-sm);
+}
 
 .eq-table {
   width: 100%;
@@ -679,6 +769,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   padding: 0.55rem 0.7rem;
   border-bottom: 1.5px solid var(--steel-200);
   white-space: nowrap;
+  background: var(--graphite-700);
 }
 
 .eq-table td {
@@ -688,7 +779,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   vertical-align: middle;
 }
 
-.eq-table tbody tr:hover { background: var(--steel-50); }
+.eq-table tbody tr:hover { background: rgba(255, 255, 255, 0.045); }
 
 .eq-mono {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -711,15 +802,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   gap: 0.35rem;
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 0.22rem 0.55rem;
+  padding: 0.3rem 0.65rem 0.3rem 0.55rem;
   border-radius: 999px;
   white-space: nowrap;
+  border: 1px solid transparent;
+  letter-spacing: 0.01em;
 }
 
-.eq-badge-ok     { background: rgba(47, 179, 128, 0.12); color: #1c8560; }
+.eq-badge-ok     { background: rgba(47, 179, 128, 0.18); color: #4ade95; }
 .eq-badge-warn   { background: rgba(255, 106, 61, 0.12); color: var(--safety-orange-dark); }
 .eq-badge-info   { background: rgba(62, 110, 142, 0.12); color: var(--steel-blue); }
-.eq-badge-danger { background: rgba(229, 72, 77, 0.1);  color: #c23c40; }
+.eq-badge-danger { background: rgba(229, 72, 77, 0.18);  color: #ff8087; }
 
 .eq-priority {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -729,7 +822,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   border-radius: var(--radius-sm);
 }
 
-.eq-priority-high   { background: rgba(229, 72, 77, 0.1);  color: #c23c40; }
+.eq-priority-high   { background: rgba(229, 72, 77, 0.18);  color: #ff8087; }
 .eq-priority-medium { background: rgba(255, 106, 61, 0.12); color: var(--safety-orange-dark); }
 .eq-priority-low    { background: rgba(100, 112, 122, 0.12); color: var(--text-muted); }
 
@@ -883,7 +976,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 .eq-row-btn-danger:hover, .eq-row-btn-danger:focus-visible {
   border-color: var(--alert-red);
-  color: #c23c40;
+  color: #ff8087;
 }
 
 .btn-tag-danger {
@@ -1429,4 +1522,85 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   color: var(--alert-red);
   font-size: 0.74rem;
   margin: 0.3rem 0 0;
+}
+
+/* ============================================================
+   Dark premium theme — polish pass
+   ------------------------------------------------------------
+   Purely visual refinements layered on top of the existing
+   classes below (extra rules on the same selectors) — no HTML/JS
+   changes, no class renames, no IDs touched. Every status badge
+   in the app (equipment, repair, maintenance, warranty) already
+   renders through the shared .eq-badge/.eq-badge-{ok,warn,info,
+   danger} classes, so this one refinement makes every status
+   label in the system consistent at once. Transitions only —
+   no @keyframes, no setInterval, nothing that loops or repeats,
+   per the anti-flicker requirement.
+   ============================================================ */
+
+/* ---- Status badges: small color dot + slightly crisper shape ---- */
+.eq-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.eq-badge-ok     { border-color: rgba(47, 179, 128, 0.25); }
+.eq-badge-warn   { border-color: rgba(255, 106, 61, 0.25); }
+.eq-badge-info   { border-color: rgba(110, 163, 199, 0.3); }
+.eq-badge-danger { border-color: rgba(229, 72, 77, 0.3); }
+
+/* ---- Summary cards: gentle hover lift ---- */
+.eq-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 28px 52px -22px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Panels: subtle top accent so panels read as distinct
+   "modules" at a glance without changing their layout ---- */
+.eq-panel:hover {
+  border-top-color: var(--safety-orange);
+}
+
+/* ---- Buttons: soft lift on hover, consistent across variants ---- */
+.btn-tag:hover, .btn-tag:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px -10px rgba(255, 106, 61, 0.55);
+}
+
+.btn-tag-outline:hover, .btn-tag-outline:focus-visible {
+  transform: translateY(-1px);
+}
+
+.eq-row-btn {
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.eq-row-btn:hover, .eq-row-btn:focus-visible {
+  transform: translateY(-1px);
+}
+
+/* ---- Tables: rounded, bordered container so the table reads as
+   one cohesive card instead of a bare grid ---- */
+.eq-table-wrap .eq-table {
+  border: none;
+}
+
+.eq-table-wrap .eq-table th:first-child { border-top-left-radius: var(--radius-sm); }
+.eq-table-wrap .eq-table th:last-child { border-top-right-radius: var(--radius-sm); }
+
+/* ---- Forms: subtle hover feedback before focus, and explicit
+   <option> colors — native <select> popups don't always inherit
+   the parent's colors in every browser, which could otherwise
+   leave light text on an unstyled white popup. ---- */
+.form-control:hover, .form-select:hover {
+  border-color: var(--steel-blue);
+}
+
+.form-select option {
+  background: var(--steel-100);
+  color: var(--text-dark);
 }

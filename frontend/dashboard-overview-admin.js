@@ -37,69 +37,6 @@ function dashOverviewCard(label, value, accent) {
     </div>`;
 }
 
-/* ---------- 1. Equipment Statistics (incl. category breakdown) ---------- */
-
-async function renderAdminEquipmentStats() {
-  const el = document.getElementById("dashEquipmentStats");
-  if (!el) return;
-
-  try {
-    const equipment = await fetchEquipment();
-    const total = equipment.length;
-    const operational = equipment.filter((e) => e.status === "OPERATIONAL").length;
-    const underRepair = equipment.filter((e) => e.status === "UNDER_REPAIR").length;
-    const outOfService = equipment.filter((e) => e.status === "OUT_OF_SERVICE").length;
-    if (total === 0) {
-      el.innerHTML = `<p class="eq-empty-state">No equipment available.</p>`;
-      return;
-    }
-
-    el.innerHTML = [
-      dashOverviewCard("Total Equipment", total, "info"),
-      dashOverviewCard("Operational", operational, "ok"),
-      dashOverviewCard("Under Repair", underRepair, "danger"),
-      dashOverviewCard("Out of Service", outOfService, "danger"),
-    ].join("");
-  } catch (err) {
-    el.innerHTML = `<p class="eq-empty-state">Couldn't load equipment statistics.</p>`;
-  }
-}
-
-/* ---------- 2. Pending Requests ---------- */
-
-async function renderAdminPendingRequests() {
-  const countEl = document.getElementById("dashPendingCount");
-  const body = document.getElementById("dashPendingBody");
-  const empty = document.getElementById("dashPendingEmpty");
-  if (!body) return;
-
-  try {
-    const all = await fetchAllRepairRequests();
-    const pending = all.filter((r) => r.status === "PENDING");
-    if (countEl) countEl.textContent = pending.length;
-
-    const recent = pending.slice(0, 5); // already ordered most-recent-first by the API
-    if (recent.length === 0) {
-      body.innerHTML = "";
-      if (empty) empty.hidden = false;
-      return;
-    }
-    if (empty) empty.hidden = true;
-
-    body.innerHTML = recent.map((r) => `
-      <tr>
-        <td class="eq-mono">#${r.id}</td>
-        <td>${dashOverviewEscapeHtml(r.equipmentName)} <span class="eq-mono eq-muted">${dashOverviewEscapeHtml(r.equipmentId)}</span></td>
-        <td>${dashOverviewEscapeHtml(r.submittedByFullName)}</td>
-        <td>${repairStatusBadge(r.status)}</td>
-        <td>${dashOverviewEscapeHtml(r.submittedDate || "—")}</td>
-      </tr>`).join("");
-  } catch (err) {
-    body.innerHTML = "";
-    if (empty) { empty.hidden = false; empty.textContent = "Couldn't load pending requests."; }
-  }
-}
-
 /* ---------- 3. Maintenance Schedule (upcoming / overdue) ---------- */
 
 async function renderAdminMaintenanceSchedule() {
@@ -152,7 +89,6 @@ async function renderAdminRepairStats() {
     const totalRepairs = allRequests.length;
     const completedRepairs = history.length;
     const totalCost = history.reduce((sum, h) => sum + (Number(h.repairCost) || 0), 0);
-    const avgCost = completedRepairs > 0 ? totalCost / completedRepairs : 0;
 
     if (totalRepairs === 0) {
       el.innerHTML = `<p class="eq-empty-state">No repair history available.</p>`;
@@ -163,7 +99,6 @@ async function renderAdminRepairStats() {
       dashOverviewCard("Total Repairs", totalRepairs, "info"),
       dashOverviewCard("Completed Repairs", completedRepairs, "ok"),
       dashOverviewCard("Total Repair Cost", totalCost.toFixed(2), "warn"),
-      dashOverviewCard("Average Repair Cost", avgCost.toFixed(2), "warn"),
     ].join("");
   } catch (err) {
     el.innerHTML = `<p class="eq-empty-state">Couldn't load repair statistics.</p>`;
@@ -216,46 +151,11 @@ async function renderAdminWarrantyAlerts() {
   }
 }
 
-/* ---------- 6. Usage Statistics ---------- */
-
-async function renderAdminUsageStats() {
-  const el = document.getElementById("dashUsageStats");
-  if (!el) return;
-
-  try {
-    const dash = await fetchUsageDashboard();
-    const equipment = dash.equipment || [];
-    // "Total sessions for the selected/current date": this app logs total
-    // daily hours per equipment rather than discrete sessions, so the
-    // honest equivalent is how many pieces of equipment have any usage
-    // logged for today.
-    const loggedToday = equipment.filter((e) => e.todayUsageHours > 0).length;
-    const mostUsed = (dash.mostUsedToday && dash.mostUsedToday[0]) || null;
-    const highUsageCount = equipment.filter((e) => e.maintenanceStatus === "MAINTENANCE_DUE").length;
-
-    if (equipment.length === 0) {
-      el.innerHTML = `<p class="eq-empty-state">No usage data available.</p>`;
-      return;
-    }
-
-    el.innerHTML = [
-      dashOverviewCard("Equipment Logged Today", loggedToday, "info"),
-      dashOverviewCard("Most Used Today", mostUsed ? mostUsed.equipmentName : "—", "ok"),
-      dashOverviewCard("High-Usage Equipment", highUsageCount, "warn"),
-    ].join("");
-  } catch (err) {
-    el.innerHTML = `<p class="eq-empty-state">Couldn't load usage statistics.</p>`;
-  }
-}
-
 /* ---------- Init ---------- */
 
 function initDashboardOverviewAdmin(session) {
   if (session.role !== "ADMIN") return;
-  renderAdminEquipmentStats();
-  renderAdminPendingRequests();
   renderAdminMaintenanceSchedule();
   renderAdminRepairStats();
   renderAdminWarrantyAlerts();
-  renderAdminUsageStats();
 }
