@@ -2,7 +2,7 @@
 
 Full-stack application for managing gym equipment, usage, repair requests, maintenance schedules, repair history, warranties, dashboards, and reports.
 
-\`\`\`text
+```text
 
 HTML + CSS + JavaScript
 
@@ -18,69 +18,69 @@ Spring Data JPA
 
 MySQL Database
 
-\`\`\`
+```
 
 **## Project Layout**
 
-\`\`\`text
+```text
 
 backend/     Java 17 / Spring Boot / Maven — REST API, authentication, business logic, MySQL access
 
 frontend/    Static HTML/CSS/JavaScript site calling the REST API
 
-\`\`\`
+```
 
 **## Features**
 
 **### Module 1 — Authentication & User Management**
 
-\- User registration and login against MySQL
+- User registration and login against MySQL
 
-\- BCrypt password hashing
+- BCrypt password hashing
 
-\- JWT-based authentication
+- JWT-based authentication
 
-\- Role-based access control enforced by the backend
+- Role-based access control enforced by the backend
 
-\- Roles: Admin, Gym Manager, Technician
+- Roles: Admin, Gym Manager, Technician
 
-\- Technician IDs generated automatically:
+- Technician IDs generated automatically:
 
-\`\`\`text
+```text
 
 TECH001, TECH002, TECH003, ...
 
-\`\`\`
+```
 
 **### Module 2 — Equipment Management**
 
 Admin can:
 
-\- Add equipment
+- Add equipment
 
-\- View equipment
+- View equipment
 
-\- Update equipment
+- Update equipment
 
-\- Delete equipment
+- Delete equipment
 
-\- Search and filter equipment
+- Search and filter equipment
 
 Additional features:
 
-\- Backend-generated equipment IDs:
+- Backend-generated equipment IDs:
 
-\`\`\`text
+```text
 
 EQ001, EQ002, EQ003, ...
 
-\`\`\`
+```
 
-\- Equipment name-to-category mapping enforced by the backend
+- Equipment name-to-category mapping enforced by the backend
 
-\- Equipment status tracking
+- Equipment status tracking
 
-\- Maintenance interval selection
+- Maintenance interval selection
 
 **### Module 3 — Usage Monitoring**
 
@@ -88,31 +88,31 @@ Tracks equipment usage per day.
 
 Admin can:
 
-\- View current equipment usage
+- View current equipment usage
 
-\- View usage history
+- View usage history
 
-\- View usage summaries and statistics
+- View usage summaries and statistics
 
-\- Identify most and least used equipment
+- Identify most and least used equipment
 
-\- Monitor highly used equipment
+- Monitor highly used equipment
 
-\- Filter usage records
+- Filter usage records
 
-\- Delete incorrect usage records
+- Delete incorrect usage records
 
 Gym Manager can:
 
-\- View equipment usage
+- View equipment usage
 
-\- Record daily usage
+- Record daily usage
 
-\- Update usage records
+- Update usage records
 
-\- View usage history and statistics
+- View usage history and statistics
 
-\- Use batch usage logging
+- Use batch usage logging
 
 The system supports daily usage tracking and displays equipment with no usage for the selected day as zero usage rather than omitting it.
 
@@ -120,33 +120,33 @@ The system supports daily usage tracking and displays equipment with no usage fo
 
 Gym Manager can:
 
-\- Report equipment problems
+- Report equipment problems
 
-\- Select the affected equipment
+- Select the affected equipment
 
-\- View submitted repair requests
+- View submitted repair requests
 
-\- Track repair request status
+- Track repair request status
 
-\- View rejection reasons when a request is rejected
+- View rejection reasons when a request is rejected
 
 Admin can:
 
-\- View all repair requests
+- View all repair requests
 
-\- Approve or reject requests
+- Approve or reject requests
 
-\- Provide a rejection reason when rejecting a request
+- Provide a rejection reason when rejecting a request
 
-\- Assign a technician after approval
+- Assign a technician after approval
 
-\- Monitor repair progress
+- Monitor repair progress
 
-\- Change equipment status when necessary
+- Change equipment status when necessary
 
 Repair workflow includes:
 
-\`\`\`text
+```text
 
 PENDING
 
@@ -160,11 +160,11 @@ IN_PROGRESS
 
 COMPLETED
 
-\`\`\`
+```
 
 Equipment can be marked unavailable when a serious issue is reported. Equipment status supports states such as:
 
-\`\`\`text
+```text
 
 OPERATIONAL
 
@@ -176,25 +176,25 @@ UNDER_REPAIR
 
 OUT_OF_SERVICE
 
-\`\`\`
+```
 
 **### Module 5 — Maintenance Management**
 
 Admin can:
 
-\- Schedule maintenance
+- Schedule maintenance
 
-\- Select maintenance type
+- Select maintenance type
 
-\- Assign a technician
+- Assign a technician
 
-\- View scheduled maintenance
+- View scheduled maintenance
 
-\- Monitor maintenance status
+- Monitor maintenance status
 
 Maintenance types include:
 
-\`\`\`text
+```text
 
 ROUTINE_MAINTENANCE
 
@@ -204,21 +204,21 @@ INSPECTION
 
 CLEANING
 
-\`\`\`
+```
 
 Technician can:
 
-\- View assigned maintenance tasks
+- View assigned maintenance tasks
 
-\- Update maintenance status
+- Update maintenance status
 
-\- Add completion details
+- Add completion details
 
-\- Track scheduled and completed maintenance work
+- Track scheduled and completed maintenance work
 
 Maintenance statuses include:
 
-\`\`\`text
+```text
 
 SCHEDULED
 
@@ -228,66 +228,35 @@ COMPLETED
 
 CANCELLED
 
-\`\`\`
+```
 
 **### Module 6 — Repair History**
 
 Technician can record completed repair details, including:
 
-\- Work performed
+- Work performed
 
-\- Parts used
+- Parts used
 
-\- Repair cost
+- Repair cost
 
-\- Completion notes
-
-Admin can:
-
-\- View complete repair history
-
-\- Review repair details for equipment
-
-\- Track parts used and repair costs
-
-\- View completion information for completed repairs
-
-**### Module 7 — Warranty Management**
+- Completion notes
 
 Admin can:
 
-- Add and manage warranty information for equipment
-- Track warranty details and expiry dates
-- Monitor warranty status
-- Identify equipment with expired warranties
-- Manage warranty information as part of equipment maintenance records
+- View complete repair history
 
-The system supports warranty tracking so that warranty information remains associated with the relevant equipment and can be reviewed when maintenance or repair decisions are made.
+- Review repair details for equipment
 
-**### Module 8 — Dashboard & Reports**
+- Track parts used and repair costs
 
-Admin can:
-
-- View dashboard information for equipment and maintenance activities
-- Generate and review reports
-- View equipment status information
-- View maintenance and repair information
-- Review warranty information
-- Monitor technician performance
-
-Gym Manager can:
-
-- Monitor equipment information
-- View available reports
-- Review maintenance, repair, equipment-status, and warranty information
-
-The reporting functionality supports operational monitoring and helps identify maintenance-related information such as due maintenance and frequently repaired equipment.
+- View completion information for completed repairs
 
 **## No Default Account**
 
-There is **\*\*no seeded admin account\*\*** and **\*\*no hardcoded credentials\*\***.
+There is ****no seeded admin account**** and ****no hardcoded credentials****.
 
-Create the first account through the **\*\*Create Account\*\*** page.
+Create the first account through the ****Create Account**** page.
 
 **---**
 
@@ -295,27 +264,27 @@ Create the first account through the **\*\*Create Account\*\*** page.
 
 The application has three parts involved in normal operation:
 
-1\. **\*\*MySQL database\*\*** — must be running.
+1. ****MySQL database**** — must be running.
 
-2\. **\*\*Spring Boot backend\*\*** — runs from \`backend/\` on port \`8080\`.
+2. ****Spring Boot backend**** — runs from \`backend/\` on port \`8080\`.
 
-3\. **\*\*Static frontend\*\*** — served locally, normally on port \`5500\`.
+3. ****Static frontend**** — served locally, normally on port \`5500\`.
 
-\> **\*\*Important:\*\*** Do not open \`login.html\` directly using a \`file://\` URL. Serve the frontend through HTTP, for example using VS Code Live Server.
+> ****Important:**** Do not open \`login.html\` directly using a \`file://\` URL. Serve the frontend through HTTP, for example using VS Code Live Server.
 
 **## 1. Open the Project**
 
 Open the project folder in VS Code:
 
-\`\`\`text
+```text
 
 Gym-Equipment-Maintenance-System/
 
-\`\`\`
+```
 
 Project structure:
 
-\`\`\`text
+```text
 
 Gym-Equipment-Maintenance-System/
 
@@ -323,15 +292,15 @@ Gym-Equipment-Maintenance-System/
 
 └── frontend/
 
-\`\`\`
+```
 
 The Maven project is inside:
 
-\`\`\`text
+```text
 
 Gym-Equipment-Maintenance-System/backend/
 
-\`\`\`
+```
 
 Therefore, Maven commands must be executed from the \`backend\` directory.
 
@@ -341,21 +310,21 @@ Make sure your local MySQL server is running.
 
 Open:
 
-\`\`\`text
+```text
 
 backend/src/main/resources/application.properties
 
-\`\`\`
+```
 
 Configure the datasource credentials for your local MySQL installation.
 
 The database schema is:
 
-\`\`\`text
+```text
 
 gym_ams
 
-\`\`\`
+```
 
 The application uses Hibernate schema updates, so supported tables and schema changes are created or updated when the backend starts.
 
@@ -363,99 +332,99 @@ The application uses Hibernate schema updates, so supported tables and schema ch
 
 Before starting the backend, set your database password in PowerShell:
 
-\`\`\`powershell
+```powershell
 
-$env\:DB_PASSWORD="your_actual_mysql_password"
+$env:DB_PASSWORD="your_actual_mysql_password"
 
-\`\`\`
+```
 
 **## 4. Check Whether Port 8080 Is Already in Use**
 
 Check port 8080:
 
-\`\`\`powershell
+```powershell
 
 netstat -ano | findstr :8080
 
-\`\`\`
+```
 
 Example:
 
-\`\`\`text
+```text
 
 TCP    0.0.0.0:8080    0.0.0.0:0    LISTENING    12345
 
-\`\`\`
+```
 
 The last number is the PID.
 
 Identify the process:
 
-\`\`\`powershell
+```powershell
 
 tasklist /FI "PID eq 12345"
 
-\`\`\`
+```
 
 If it is an old backend process that should be stopped:
 
-\`\`\`powershell
+```powershell
 
 taskkill /PID 12345 /F
 
-\`\`\`
+```
 
 Verify that the port is free:
 
-\`\`\`powershell
+```powershell
 
 netstat -ano | findstr :8080
 
-\`\`\`
+```
 
-\> If the backend was started in an open terminal using \`mvn spring-boot\:run\` or \`mvnd spring-boot\:run\`, press \`Ctrl+C\` in that terminal instead.
+> If the backend was started in an open terminal using \`mvn spring-boot:run\` or \`mvnd spring-boot:run\`, press \`Ctrl+C\` in that terminal instead.
 
 **## 5. Start the Backend**
 
 Open PowerShell in the \`backend\` directory:
 
-\`\`\`powershell
+```powershell
 
 cd "C:\Users\kisho\OneDrive\Desktop\Documents\GitHub\sdp\Gym-Equipment-Maintenance-System\backend"
 
-\`\`\`
+```
 
 Verify that \`pom.xml\` exists:
 
-\`\`\`powershell
+```powershell
 
 dir pom.xml
 
-\`\`\`
+```
 
 Start Spring Boot:
 
-\`\`\`powershell
+```powershell
 
-mvn spring-boot\:run
+mvn spring-boot:run
 
-\`\`\`
+```
 
 Or:
 
-\`\`\`powershell
+```powershell
 
-mvnd spring-boot\:run
+mvnd spring-boot:run
 
-\`\`\`
+```
 
 The backend runs at:
 
-\`\`\`text
+```text
 
-http\://localhost:8080
+http://localhost:8080
 
-\`\`\`
+```
 
 Keep this terminal running while using the application.
 
@@ -467,155 +436,155 @@ The frontend must be served through a local HTTP server.
 
 Right-click:
 
-\`\`\`text
+```text
 
 frontend/login.html
 
-\`\`\`
+```
 
 Select:
 
-\`\`\`text
+```text
 
 Open with Live Server
 
-\`\`\`
+```
 
 The frontend will normally open at:
 
-\`\`\`text
+```text
 
-http\://127.0.0.1:5500/login.html
+http://127.0.0.1:5500/login.html
 
-\`\`\`
+```
 
 or:
 
-\`\`\`text
+```text
 
-http\://localhost:5500/login.html
+http://localhost:5500/login.html
 
-\`\`\`
+```
 
 **### Option B — http-server**
 
 From the project root:
 
-\`\`\`powershell
+```powershell
 
 npx http-server frontend -p 5500
 
-\`\`\`
+```
 
 Then open:
 
-\`\`\`text
+```text
 
-http\://localhost:5500/login.html
+http://localhost:5500/login.html
 
-\`\`\`
+```
 
 **## 7. If Port 5500 Is Already in Use**
 
 Check the port:
 
-\`\`\`powershell
+```powershell
 
 netstat -ano | findstr :5500
 
-\`\`\`
+```
 
 Identify the process:
 
-\`\`\`powershell
+```powershell
 
-tasklist /FI "PID eq \<PID>"
+tasklist /FI "PID eq <PID>"
 
-\`\`\`
+```
 
 After confirming it is the unwanted process:
 
-\`\`\`powershell
+```powershell
 
-taskkill /PID \<PID> /F
+taskkill /PID <PID> /F
 
-\`\`\`
+```
 
-If using VS Code Live Server, use its **\*\*Stop Server\*\*** command instead.
+If using VS Code Live Server, use its ****Stop Server**** command instead.
 
 **## 8. Verify the Application**
 
 Backend:
 
-\`\`\`text
+```text
 
-http\://localhost:8080
+http://localhost:8080
 
-\`\`\`
+```
 
 Frontend:
 
-\`\`\`text
+```text
 
-http\://localhost:5500/login.html
+http://localhost:5500/login.html
 
-\`\`\`
+```
 
 The frontend API configuration is in:
 
-\`\`\`text
+```text
 
 frontend/script.js
 
-\`\`\`
+```
 
 The API base URL should point to:
 
-\`\`\`javascript
+```javascript
 
-const API_BASE_URL = "http\://localhost:8080/api";
+const API_BASE_URL = "http://localhost:8080/api";
 
-\`\`\`
+```
 
 If the backend host or port changes, update the frontend API URL and backend CORS configuration accordingly.
 
 **## 9. Recommended Startup Sequence**
 
-1\. Start **\*\*MySQL\*\***.
+1. Start ****MySQL****.
 
-2\. Configure the database password if required.
+2. Configure the database password if required.
 
-3\. Check whether port **\*\*8080\*\*** is occupied.
+3. Check whether port ****8080**** is occupied.
 
-4\. Stop an old backend process if necessary.
+4. Stop an old backend process if necessary.
 
-5\. Open a terminal inside \`backend/\`.
+5. Open a terminal inside \`backend/\`.
 
-6\. Run:
+6. Run:
 
-\`\`\`powershell
+```powershell
 
-mvn spring-boot\:run
+mvn spring-boot:run
 
-\`\`\`
+```
 
 or:
 
-\`\`\`powershell
+```powershell
 
-mvnd spring-boot\:run
+mvnd spring-boot:run
 
-\`\`\`
+```
 
-7\. Start **\*\*Live Server\*\*** for \`frontend/login.html\`, or run another local HTTP server.
+7. Start ****Live Server**** for \`frontend/login.html\`, or run another local HTTP server.
 
-8\. Open:
+8. Open:
 
-\`\`\`text
+```text
 
-http\://localhost:5500/login.html
+http://localhost:5500/login.html
 
-\`\`\`
+```
 
 **---**
 
@@ -623,109 +592,107 @@ http\://localhost:5500/login.html
 
 **## Authentication and Roles**
 
-\- Create Admin, Gym Manager, and Technician accounts.
+- Create Admin, Gym Manager, and Technician accounts.
 
-\- Verify that each role is redirected to the correct dashboard.
+- Verify that each role is redirected to the correct dashboard.
 
-\- Verify that role-specific actions are restricted by the backend.
+- Verify that role-specific actions are restricted by the backend.
 
 **## Equipment Management**
 
 As Admin:
 
-1\. Add equipment.
+1. Add equipment.
 
-2\. Verify automatic Equipment ID generation.
+2. Verify automatic Equipment ID generation.
 
-3\. Search and filter equipment.
+3. Search and filter equipment.
 
-4\. Update equipment details.
+4. Update equipment details.
 
-5\. Delete equipment when appropriate.
+5. Delete equipment when appropriate.
 
 **## Usage Monitoring**
 
 As Gym Manager:
 
-1\. Open Usage Monitoring.
+1. Open Usage Monitoring.
 
-2\. Enter daily usage.
+2. Enter daily usage.
 
-3\. Use Batch Usage Logging where available.
+3. Use Batch Usage Logging where available.
 
-4\. Save the records.
+4. Save the records.
 
 As Admin:
 
-1\. Verify usage summaries.
+1. Verify usage summaries.
 
-2\. View usage history.
+2. View usage history.
 
-3\. Check most and least used equipment.
+3. Check most and least used equipment.
 
-4\. Delete an incorrect usage record if required.
+4. Delete an incorrect usage record if required.
 
 **## Repair Request Management**
 
 As Gym Manager:
 
-1\. Select equipment with a problem.
+1. Select equipment with a problem.
 
-2\. Submit a repair request.
+2. Submit a repair request.
 
-3\. View the submitted request.
+3. View the submitted request.
 
-4\. Track its status.
+4. Track its status.
 
 As Admin:
 
-1\. View the request.
+1. View the request.
 
-2\. Approve or reject it.
+2. Approve or reject it.
 
-3\. Enter a rejection reason when rejecting.
+3. Enter a rejection reason when rejecting.
 
-4\. Assign a technician to an approved request.
+4. Assign a technician to an approved request.
 
-5\. Monitor repair progress and update equipment availability when necessary.
+5. Monitor repair progress and update equipment availability when necessary.
 
 **## Maintenance Management**
 
 As Admin:
 
-1\. Schedule maintenance.
+1. Schedule maintenance.
 
-2\. Select a maintenance type.
+2. Select a maintenance type.
 
-3\. Assign a technician.
+3. Assign a technician.
 
-4\. View the maintenance schedule.
+4. View the maintenance schedule.
 
 As Technician:
 
-1\. View assigned maintenance.
+1. View assigned maintenance.
 
-2\. Update the maintenance status.
+2. Update the maintenance status.
 
-3\. Add completion details.
+3. Add completion details.
 
-4\. Mark the task as completed.
+4. Mark the task as completed.
 
 **## Repair History**
 
 After completing a repair, verify that repair history can record and display:
 
-\- Work performed
+- Work performed
 
-\- Parts used
+- Parts used
 
-\- Repair cost
+- Repair cost
 
-\- Completion notes
+- Completion notes
 
 As Admin, verify that completed repair information can be viewed.
-
-**---**
 
 **## Warranty Management**
 
@@ -735,7 +702,7 @@ As Admin:
 2. Verify that warranty details are stored correctly.
 3. Check warranty expiry information.
 4. Verify that expired warranty equipment can be identified.
-5. Review warranty information from the relevant equipment records.
+5. Review warranty information for equipment.
 
 As Gym Manager:
 
@@ -756,7 +723,7 @@ As Admin:
 As Gym Manager:
 
 1. Open the available reports.
-2. Verify that equipment and maintenance information is displayed.
+2. Verify equipment and maintenance information.
 3. Review repair, warranty, and equipment-status information.
 
 **---
@@ -765,33 +732,33 @@ As Gym Manager:
 
 **## Backend**
 
-\- Java 17
+- Java 17
 
-\- Spring Boot
+- Spring Boot
 
-\- Spring Web
+- Spring Web
 
-\- Spring Data JPA
+- Spring Data JPA
 
-\- Spring Security
+- Spring Security
 
-\- JWT Authentication
+- JWT Authentication
 
-\- BCrypt Password Hashing
+- BCrypt Password Hashing
 
-\- MySQL
+- MySQL
 
-\- Maven
+- Maven
 
 **## Frontend**
 
-\- HTML
+- HTML
 
-\- CSS
+- CSS
 
-\- JavaScript
+- JavaScript
 
-\- Bootstrap 5
+- Bootstrap 5
 
 **---**
 
@@ -801,18 +768,18 @@ The project is **completed**. All eight planned modules have been implemented:
 
 Completed modules:
 
-\- Module 1 — Authentication & User Management
+- Module 1 — Authentication & User Management
 
-\- Module 2 — Equipment Management
+- Module 2 — Equipment Management
 
-\- Module 3 — Usage Monitoring
+- Module 3 — Usage Monitoring
 
-\- Module 4 — Repair Request Management
+- Module 4 — Repair Request Management
 
-\- Module 5 — Maintenance Management
+- Module 5 — Maintenance Management
 
-\- Module 6 — Repair History
+- Module 6 — Repair History
 
-\- Module 7 — Warranty Management
+- Module 7 — Warranty Management
 
-\- Module 8 — Dashboard & Reports
+- Module 8 — Dashboard & Reports
